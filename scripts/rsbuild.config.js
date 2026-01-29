@@ -21,6 +21,9 @@ export default defineConfig({
       root: './build',
     },
     cleanDistPath: true, // Clean build directory before each build
+    copy: [
+      { from: './src/assets', to: 'assets/' },
+    ],
   },
   server: {
     port: 3000, // Default port, will be overridden in dev server

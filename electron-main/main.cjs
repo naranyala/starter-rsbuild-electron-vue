@@ -1,6 +1,6 @@
 // Basic init
 const electron = require('electron');
-const { app, BrowserWindow } = electron;
+const { app, BrowserWindow, ipcMain } = electron;
 const path = require('path');
 const url = require('url');
 const args = process.argv.slice(1);
@@ -50,20 +50,30 @@ app.on('activate', () => {
 });
 
 function createWindow() {
+  // Create the browser window with better defaults for Electron apps
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
+    minWidth: 800,
+    minHeight: 600,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
       webSecurity: false,
+      // Enable devtools in development
+      devTools: serve,
     },
+    // Add native window decorations
+    frame: true,
+    // Add icon for the window
+    icon: path.join(__dirname, '../src/assets/icons/favicon.ico'),
   });
 
+  // Load the index.html of the app
   const startUrl = serve
     ? `http://localhost:${port}`
     : url.format({
-        pathname: path.join(__dirname, 'build/index.html'),
+        pathname: path.join(__dirname, '../build/index.html'),
         protocol: 'file:',
         slashes: true,
       });
@@ -75,7 +85,18 @@ function createWindow() {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
+  // Handle window close event
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  // Handle unresponsive events
+  mainWindow.on('unresponsive', () => {
+    console.log('Window became unresponsive');
+  });
+
+  // Handle responsive events
+  mainWindow.on('responsive', () => {
+    console.log('Window became responsive again');
   });
 }
