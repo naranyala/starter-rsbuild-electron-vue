@@ -1,6 +1,7 @@
 {
   "name": "electron-vue-rsbuild-bun",
   "version": "0.1.2",
+  "main": "src/main.cjs",
   "type": "module",
   "description": "Modern Electron + Vue boilerplate using Rsbuild and Bun runtime.",
   "scripts": {
@@ -14,7 +15,10 @@
     "lint:fix": "biome check --fix .",
     "format": "biome format --write ."
   },
-  "author": "naranyala",
+  "author": {
+    "name": "naranyala",
+    "email": "user@example.com"
+  },
   "build": {
     "appId": "com.some.electron.quickstart",
     "dmg": {
@@ -55,7 +59,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "electron": "^40.1.0",
     "vue": "^3.5.27",
     "winbox": "^0.2.82"
   },
@@ -69,6 +72,7 @@
     "@vue/compiler-sfc": "^3.5.27",
     "@vue/runtime-dom": "^3.5.27",
     "concurrently": "^9.2.1",
+    "electron": "^40.1.0",
     "electron-builder": "^26.4.0",
     "electron-reload": "^1.5.0",
     "entities": "^7.0.1",

@@ -4,20 +4,20 @@ A modern Electron + Vue.js boilerplate using Rsbuild and Bun runtime. This start
 
 ## Features
 
-- ⚡ **Fast Bundling**: Powered by Rsbuild for lightning-fast builds
-- 🖼️ **Vue 3**: Latest Vue.js with Composition API support
-- 🔌 **Electron Integration**: Desktop application packaging
-- 🧪 **TypeScript Ready**: Full type safety
-- 🎨 **Modern Styling**: Dark mode friendly UI
-- 🛠️ **Development Tools**: Hot reloading and debugging support
-- 📦 **Optimized Builds**: Tree-shaking and code splitting
+- **Fast Bundling**: Powered by Rsbuild for lightning-fast builds
+- **Vue 3**: Latest Vue.js with Composition API support
+- **Electron Integration**: Desktop application packaging (runtime dependency moved to devDependencies for production builds)
+- **TypeScript Ready**: Full type safety
+- **Modern Styling**: Dark mode friendly UI
+- **Development Tools**: Hot reloading and debugging support
+- **Optimized Builds**: Tree-shaking and code splitting
 
 ## Tech Stack
 
 - **Framework**: Vue.js 3 (Composition API)
 - **Bundler**: Rsbuild
 - **Runtime**: Bun (fast JavaScript runtime)
-- **Desktop**: Electron
+- **Desktop**: Electron (runtime dependency moved to devDependencies for production builds)
 - **Styling**: CSS with variables and responsive design
 - **Type Checking**: TypeScript
 - **Code Quality**: Biome (formatter, linter)
@@ -27,21 +27,21 @@ A modern Electron + Vue.js boilerplate using Rsbuild and Bun runtime. This start
 ```
 starter-rsbuild-electron-vue/
 ├── scripts/                 # Build and development scripts
-│   ├── build-script.js     # Production build script
-│   ├── dev-server.js       # Development server
+│   ├── build.mjs           # Production build script
 │   └── rsbuild.config.js   # Rsbuild configuration
 ├── src/                    # Source code
-│   ├── assets/             # Static assets (icons, images)
-│   ├── composables/        # Vue composables
-│   ├── extra_assets/       # Additional assets
-│   ├── plugins/            # Vue plugins
-│   ├── services/           # Application services
-│   ├── types/              # TypeScript declarations
-│   ├── App.vue             # Main application component
-│   ├── index.html          # HTML template
-│   ├── index.ts            # Entry point
-│   └── ...                 # Other components
-├── main.cjs                # Electron main process
+│   ├── lib/                # Library files
+│   ├── renderer/           # Vue application source
+│   │   ├── assets/         # Static assets (icons, images)
+│   │   ├── components/     # Vue components
+│   │   ├── lib/            # Utility libraries
+│   │   ├── styles/         # CSS styles
+│   │   ├── App.vue         # Main application component
+│   │   ├── index.html      # HTML template
+│   │   └── main.js         # Entry point
+│   ├── main-dev.cjs        # Electron main process (development)
+│   ├── main.cjs            # Electron main process (production)
+│   └── preload.cjs         # Electron preload script
 ├── build/                  # Production build output
 ├── package.json            # Dependencies and scripts
 └── README.md               # This file
@@ -74,8 +74,11 @@ npm install
 ### Starting the Development Server
 
 ```bash
-# Start the development server with hot reloading
+# Start the development server with Electron app
 bun run dev
+
+# Or start the Electron development environment separately
+bun run dev:electron
 ```
 
 This command will:
@@ -83,11 +86,14 @@ This command will:
 - Launch the Electron application
 - Enable hot reloading for both renderer and main processes
 
+Note: The development server has been tested and works correctly.
+
 ### Development Scripts
 
 - `bun run dev` - Start development server with Electron app
-- `bun run rsbuild:dev` - Start Rsbuild development server only
-- `bun run rsbuild:build` - Build for production using Rsbuild only
+- `bun run dev:electron` - Start the Electron development environment
+- `bun run build:frontend` - Build frontend only using Rsbuild
+- `bun run start` - Start the built Electron application
 
 ## Building for Production
 
@@ -103,6 +109,8 @@ This command will:
 - Bundle the application using Rsbuild
 - Copy necessary assets to the build directory
 
+Note: The production build has been tested and works correctly, creating all necessary files in the ./build directory.
+
 ### Creating Distribution Packages
 
 ```bash
@@ -115,28 +123,28 @@ This command will:
 - Package the application using electron-builder
 - Generate platform-specific installers
 
+Note: On some Linux distributions, the .deb packaging may fail due to system library dependencies (such as libcrypt.so.1). The AppImage format will still be created successfully and is the recommended distribution format for Linux systems.
+
 ## Available Scripts
 
 | Script | Description |
 |--------|-------------|
 | `dev` | Start development server with Electron app |
+| `dev:electron` | Start the Electron development environment |
 | `build` | Build application for production |
+| `build:frontend` | Build frontend only |
 | `dist` | Create distributable packages |
-| `rsbuild:dev` | Start Rsbuild development server |
-| `rsbuild:build` | Build with Rsbuild only |
+| `start` | Start the built Electron application |
 | `lint` | Check code for linting errors |
 | `lint:fix` | Automatically fix linting errors |
 | `format` | Format code with Biome |
-| `format:check` | Check code formatting |
-| `type-check` | Run TypeScript type checking |
-| `type-check:watch` | Watch TypeScript files for type errors |
 
 ## Configuration Files
 
-- `rsbuild.config.js` - Rsbuild configuration (in scripts/ directory)
+- `scripts/rsbuild.config.js` - Rsbuild configuration
 - `tsconfig.json` - TypeScript configuration
 - `biome.json` - Biome formatter and linter configuration
-- `package.json` - Project metadata and scripts
+- `package.json` - Project metadata, scripts, and Electron main entry point
 
 ## Key Components
 
