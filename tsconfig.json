@@ -19,29 +19,13 @@
     "checkJs": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "types": [
-      "node",
-      "vue"
-    ]
+    "types": ["node", "vue"]
   },
-  "include": [
-    "src/**/*",
-    "types/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "build",
-    "dist"
-  ]
+  "include": ["src/**/*", "src/types/**/*"],
+  "exclude": ["node_modules", "build", "dist"]
 }

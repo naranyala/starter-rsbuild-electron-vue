@@ -6,10 +6,14 @@ const port = Math.floor(Math.random() * 10000) + 10000;
 console.log(`Starting development server on port ${port}...`);
 
 // Start Rsbuild dev server
-const rsbuildProcess = spawn('bunx', ['rsbuild', 'dev', '--port', port], {
-  stdio: 'inherit',
-  shell: true,
-});
+const rsbuildProcess = spawn(
+  'bunx',
+  ['rsbuild', 'dev', '--config', 'scripts/rsbuild.config.js', '--port', port],
+  {
+    stdio: 'inherit',
+    shell: true,
+  }
+);
 
 // Wait a bit for the Rsbuild server to start, then launch Electron
 setTimeout(() => {

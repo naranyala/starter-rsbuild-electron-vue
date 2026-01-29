@@ -7,10 +7,12 @@ try {
   execSync('rm -rf build/', { stdio: 'pipe' }).toString();
 
   // Run rsbuild build using Bun
-  execSync('bunx rsbuild build', { stdio: 'inherit' });
+  execSync('bunx rsbuild build --config scripts/rsbuild.config.js', {
+    stdio: 'inherit',
+  });
 
   // Copy the favicon after successful build
-  execSync('cp assets/favicon.ico build/favicon.ico', { stdio: 'inherit' });
+  execSync('cp src/assets/favicon.ico build/favicon.ico', { stdio: 'inherit' });
 
   console.log('Build completed successfully!');
 } catch (error) {

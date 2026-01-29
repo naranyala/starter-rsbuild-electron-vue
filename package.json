@@ -3,11 +3,11 @@
   "version": "0.1.2",
   "description": "Modern Electron + Vue boilerplate using Rsbuild and Bun runtime.",
   "scripts": {
-    "dev": "node dev-server.js",
-    "build": "node build-script.js",
+    "dev": "node scripts/dev-server.js",
+    "build": "node scripts/build-script.js",
     "dist": "bun run build && electron-builder",
-    "rsbuild:dev": "bunx rsbuild dev",
-    "rsbuild:build": "bunx rsbuild build",
+    "rsbuild:dev": "bunx rsbuild dev --config scripts/rsbuild.config.js",
+    "rsbuild:build": "bunx rsbuild build --config scripts/rsbuild.config.js",
     "lint": "biome check .",
     "lint:fix": "biome check --fix .",
     "format": "biome format --write .",
@@ -37,15 +37,13 @@
       "target": [
         "AppImage",
         "deb"
-      ],
-      "icon": "build/icon.png"
+      ]
     },
     "win": {
-      "target": "msi",
-      "icon": "build/icon.png"
+      "target": "msi"
     },
     "files": [
-      "main.js",
+      "main.cjs",
       "build/**/*"
     ]
   },

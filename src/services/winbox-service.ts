@@ -88,7 +88,9 @@ class WinBoxService {
     }
   }
 
-  createWindow(options: CreateWindowOptions = {} as CreateWindowOptions): Promise<WinBoxInstance> | WinBoxInstance {
+  createWindow(
+    options: CreateWindowOptions = {} as CreateWindowOptions
+  ): Promise<WinBoxInstance> | WinBoxInstance {
     const execute = (): WinBoxInstance => {
       const {
         id = Date.now().toString(),
@@ -184,7 +186,10 @@ class WinBoxService {
   }
 
   // Method to create a window with random content based on title
-  createWindowWithTitle(title: string, options: CreateWindowOptions = {} as CreateWindowOptions): Promise<WinBoxInstance> | WinBoxInstance {
+  createWindowWithTitle(
+    title: string,
+    options: CreateWindowOptions = {} as CreateWindowOptions
+  ): Promise<WinBoxInstance> | WinBoxInstance {
     return this.createWindow({
       ...options,
       title: options.title || title,
