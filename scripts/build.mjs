@@ -132,10 +132,10 @@ function startDevElectron() {
     
     console.log('📱 Launching Electron app pointing to development server...');
     
-    const electronProcess = spawn(electronPath, ['electron-main/main-dev.cjs'], {
+    const electronProcess = spawn(electronPath, ['src/main-dev.cjs'], {
       stdio: 'inherit',
-      env: { 
-        ...process.env, 
+      env: {
+        ...process.env,
         NODE_ENV: 'development',
         ELECTRON_DEV_SERVER: 'http://localhost:3000'
       },
@@ -186,7 +186,7 @@ function startElectronApp() {
     process.exit(1);
   }
   
-  const electronProcess = spawn(electronPath, ['electron-main/main.cjs'], {
+  const electronProcess = spawn(electronPath, ['src/main.cjs'], {
     stdio: 'inherit',
     env: process.env,
   });

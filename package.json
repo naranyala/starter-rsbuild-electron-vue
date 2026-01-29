@@ -42,7 +42,10 @@
       "target": "msi"
     },
     "files": [
-      "electron-main/**/*",
+      "src/main.cjs",
+      "src/main-dev.cjs",
+      "src/preload.cjs",
+      "src/lib/**/*",
       "build/**/*"
     ]
   },

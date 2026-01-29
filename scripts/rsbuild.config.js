@@ -11,7 +11,7 @@ export default defineConfig({
     }),
   ],
   html: {
-    template: './src/index.html',
+    template: './src/renderer/index.html',
     meta: {
       'theme-color': '#000000',
     },
@@ -22,7 +22,7 @@ export default defineConfig({
     },
     cleanDistPath: true, // Clean build directory before each build
     copy: [
-      { from: './src/assets', to: 'assets/' },
+      { from: './src/renderer/assets', to: 'assets/' },
     ],
   },
   server: {
@@ -32,7 +32,7 @@ export default defineConfig({
   },
   source: {
     entry: {
-      index: './src/main.js',
+      index: './src/renderer/main.js',
     },
   },
   performance: {
