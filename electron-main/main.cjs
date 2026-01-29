@@ -1,8 +1,16 @@
 // Basic init
-const electron = require('electron');
-const { app, BrowserWindow, ipcMain } = electron;
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const url = require('url');
+
+// Import utility functions
+const {
+  createWindow,
+  loadUrl,
+  setupWindowHandlers,
+} = require('./lib/window-utils.cjs');
+const { registerAppHandlers } = require('./lib/ipc-utils.cjs');
+
 const args = process.argv.slice(1);
 const serve = args.some(val => val === '--start-dev');
 
@@ -28,8 +36,87 @@ if (serve) {
 // To avoid being garbage collected
 let mainWindow;
 
+function createMainWindow() {
+  // Create the browser window with secure defaults
+  mainWindow = createWindow({
+    name: 'main',
+    webPreferences: serve
+      ? {
+          nodeIntegration: true,
+          contextIsolation: false,
+          webSecurity: false,
+          devTools: true,
+        }
+      : {
+          nodeIntegration: false,
+          contextIsolation: true,
+          enableRemoteModule: false,
+          webSecurity: true,
+          allowRunningInsecureContent: false,
+          experimentalFeatures: false,
+          preload: path.join(__dirname, 'preload.cjs'),
+        },
+  });
+
+  // Load the appropriate URL
+  loadUrl(mainWindow, port, serve);
+
+  setupWindowHandlers(mainWindow, serve, {
+    onReady: window => {
+      console.log('Production window ready');
+    },
+    onClosed: window => {
+      mainWindow = null;
+    },
+  });
+
+  return mainWindow;
+}
+
+// Register IPC handlers
+function registerIpcHandlers() {
+  // Register common app handlers
+  registerAppHandlers();
+
+  // Basic ping handler
+  ipcMain.handle('ping', () => 'pong');
+}
+
+// Security: Handle external links
+function setupSecurityHandlers() {
+  app.on('web-contents-created', (event, contents) => {
+    contents.on('new-window', (event, navigationUrl) => {
+      event.preventDefault();
+      shell.openExternal(navigationUrl);
+    });
+
+    contents.on('will-navigate', (event, navigationUrl) => {
+      const parsedUrl = new URL(navigationUrl);
+
+      if (serve) {
+        // In development, allow localhost and file://
+        if (
+          !parsedUrl.hostname?.includes('localhost') &&
+          !parsedUrl.protocol.includes('file:')
+        ) {
+          event.preventDefault();
+          shell.openExternal(navigationUrl);
+        }
+      } else {
+        // In production, only allow file://
+        if (!parsedUrl.protocol.includes('file:')) {
+          event.preventDefault();
+          shell.openExternal(navigationUrl);
+        }
+      }
+    });
+  });
+}
+
 app.on('ready', () => {
-  createWindow();
+  setupSecurityHandlers();
+  registerIpcHandlers();
+  createMainWindow();
 });
 
 // Quit when all windows are closed.
@@ -45,58 +132,6 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
-    createWindow();
+    createMainWindow();
   }
 });
-
-function createWindow() {
-  // Create the browser window with better defaults for Electron apps
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false,
-      // Enable devtools in development
-      devTools: serve,
-    },
-    // Add native window decorations
-    frame: true,
-    // Add icon for the window
-    icon: path.join(__dirname, '../src/assets/icons/favicon.ico'),
-  });
-
-  // Load the index.html of the app
-  const startUrl = serve
-    ? `http://localhost:${port}`
-    : url.format({
-        pathname: path.join(__dirname, '../build/index.html'),
-        protocol: 'file:',
-        slashes: true,
-      });
-
-  mainWindow.loadURL(startUrl);
-
-  // Open DevTools in development
-  if (serve) {
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
-  }
-
-  // Handle window close event
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  // Handle unresponsive events
-  mainWindow.on('unresponsive', () => {
-    console.log('Window became unresponsive');
-  });
-
-  // Handle responsive events
-  mainWindow.on('responsive', () => {
-    console.log('Window became responsive again');
-  });
-}

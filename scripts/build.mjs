@@ -89,15 +89,15 @@ function buildElectron(shouldPackage = false) {
 // Start development server for web
 function startDevWeb() {
   console.log('🔧 Starting web development server...');
-  
+
   checkNodeModules();
-  
+
   const rsbuildPath = getRsbuildPath();
   if (!fs.existsSync(rsbuildPath)) {
     console.error('❌ Rsbuild not found. Please install dependencies first.');
     process.exit(1);
   }
-  
+
   execSync(`${rsbuildPath} dev --config scripts/rsbuild.config.js`, {
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'development' }
@@ -217,9 +217,9 @@ switch (command) {
     break;
     
   case 'dev':
-    startDevWeb();
+    startDevElectron();
     break;
-    
+
   case 'dev:electron':
     startDevElectron();
     break;
@@ -233,7 +233,7 @@ switch (command) {
     console.log('  node scripts/build.mjs build              # Build full Electron app');
     console.log('  node scripts/build.mjs build --package    # Build and package Electron app');
     console.log('  node scripts/build.mjs build:frontend     # Build frontend only');
-    console.log('  node scripts/build.mjs dev               # Start web dev server');
+    console.log('  node scripts/build.mjs dev               # Start Electron dev environment');
     console.log('  node scripts/build.mjs dev:electron      # Start Electron dev environment');
     console.log('  node scripts/build.mjs start             # Start built Electron app');
     process.exit(1);

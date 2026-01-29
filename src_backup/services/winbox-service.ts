@@ -153,6 +153,7 @@ class WinBoxService {
         modal: modal,
         className: classNames.join(' '),
         onclose: () => {
+          // Clean up the instance from our map
           this.instances.delete(id);
           return true;
         },
@@ -160,6 +161,19 @@ class WinBoxService {
 
       // Store the instance after it's fully created
       this.instances.set(id, winboxInstance);
+
+      // Ensure the close button works properly by adding manual event handling
+      setTimeout(() => {
+        const closeButton = document.querySelector(`#${id} .wb-close`);
+        if (closeButton) {
+          // Add click event listener to ensure close functionality
+          closeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            winboxInstance.close();
+          });
+        }
+      }, 100); // Small delay to ensure DOM is ready
 
       // Disable maximize/minimize if specified in options
       if (!enableMaximize) {

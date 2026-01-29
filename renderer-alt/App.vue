@@ -7,20 +7,17 @@
           class="search-input"
           placeholder="Search topics..."
           v-model="searchTerm"
-          autocomplete="off"
-          spellcheck="false"
         />
         <div class="cards-list">
           <div
             v-for="(card, index) in filteredCards"
-            :key="card.id || card.index"
+            :key="card.id || index"
             class="simple-card"
-            @click="handleCardClick(card, card.index)"
-            :title="`Click to view details about ${card.title}`"
+            @click="handleCardClick(card, index)"
           >
             <h3
               class="simple-card-title"
-              v-html="card.highlightedTitle"
+              v-html="processTitle(card.title, searchTerm)"
             />
           </div>
           <div v-if="filteredCards.length === 0" class="no-results">
@@ -30,7 +27,7 @@
       </div>
     </main>
     <footer class="App-footer">
-      <p>Electron + Vue Starter | <code>renderer-alt</code> | Desktop Application</p>
+      <p>Get started by editing <code>src/App.vue</code> and save to reload.</p>
     </footer>
   </div>
 </template>
@@ -51,90 +48,39 @@ export default {
   },
   computed: {
     filteredCards() {
-      return menuData
-        .map((card, index) => {
-          const searchResult = this.fuzzySearch(card.title, this.searchTerm);
-          return {
-            ...card,
-            index,
-            searchScore: searchResult.score,
-            highlightedTitle: searchResult.highlightedText,
-            matches: searchResult.matches,
-          };
-        })
-        .filter(card => card.matches)
-        .sort((a, b) => b.searchScore - a.searchScore);
+      return menuData.filter((card, index) => {
+        const titleMatch = this.fuzzySearch(card.title, this.searchTerm).matches;
+        return titleMatch;
+      });
     },
   },
   methods: {
     fuzzySearch(text, query) {
-      if (!query || query.trim() === '')
-        return { matches: true, highlightedText: text, score: 1 };
+      if (!query) return { matches: true, highlightedText: text };
 
       const lowerText = text.toLowerCase();
-      const lowerQuery = query.toLowerCase().trim();
+      const lowerQuery = query.toLowerCase();
 
-      // Prioritize exact word matches first
-      if (lowerText === lowerQuery) {
-        return {
-          matches: true,
-          highlightedText: `<mark>${text}</mark>`,
-          score: 2,
-        };
-      }
-
-      // Check for exact substring match (highest priority)
-      if (lowerText.includes(lowerQuery)) {
-        const startIndex = lowerText.indexOf(lowerQuery);
-        const endIndex = startIndex + lowerQuery.length;
-        const beforeMatch = text.substring(0, startIndex);
-        const match = text.substring(startIndex, endIndex);
-        const afterMatch = text.substring(endIndex);
-        const highlightedText = `${beforeMatch}<mark>${match}</mark>${afterMatch}`;
-        return { matches: true, highlightedText, score: 1.5 };
-      }
-
-      // Fuzzy character matching as last resort
-      const queryChars = lowerQuery.split('');
-      let textIndex = 0;
+      let matchFound = true;
+      let highlightedText = '';
       let queryIndex = 0;
-      const matches = [];
-      let score = 0;
 
-      while (textIndex < lowerText.length && queryIndex < queryChars.length) {
-        if (lowerText[textIndex] === queryChars[queryIndex]) {
-          matches.push(textIndex);
-          score += 1; // Basic match score
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const lowerChar = char.toLowerCase();
 
-          // Bonus for consecutive matches
-          if (queryIndex > 0 && matches[queryIndex - 1] === textIndex - 1) {
-            score += 2;
-          }
-
+        if (queryIndex < lowerQuery.length && lowerChar === lowerQuery[queryIndex]) {
+          highlightedText += `<mark>${char}</mark>`;
           queryIndex++;
+        } else {
+          highlightedText += char;
         }
-        textIndex++;
       }
 
-      if (queryIndex === queryChars.length) {
-        // All characters found - create highlighted text
-        let highlightedText = '';
-        let lastIndex = 0;
+      // Check if all query characters were found in sequence
+      matchFound = queryIndex === lowerQuery.length;
 
-        matches.forEach((matchIndex, i) => {
-          highlightedText += text.substring(lastIndex, matchIndex);
-          highlightedText += `<mark>${text[matchIndex]}</mark>`;
-          lastIndex = matchIndex + 1;
-        });
-        highlightedText += text.substring(lastIndex);
-
-        // Normalize score
-        score = score / (queryChars.length * 3);
-
-        return { matches: true, highlightedText, score };
-      }
-
-      return { matches: false, highlightedText: text, score: 0 };
+      return { matches: matchFound, highlightedText };
     },
 
     processTitle(title, searchTerm) {
@@ -170,7 +116,7 @@ export default {
         height: '400px',
         x: 'center',
         y: 'center',
-        class: 'modern dark-theme',
+        class: 'modern',
         background: windowTheme.bg,
         border: 4,
       });
@@ -178,9 +124,7 @@ export default {
       // Set the content after the window is created using WinBox's body property
       setTimeout(() => {
         if (winbox && winbox.body) {
-          const contentDiv = winbox.body.querySelector(
-            '.winbox-dynamic-content'
-          );
+          const contentDiv = winbox.body.querySelector('.winbox-dynamic-content');
           if (contentDiv) {
             contentDiv.innerHTML = dynamicContent;
           } else {

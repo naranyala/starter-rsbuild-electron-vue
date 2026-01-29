@@ -11,7 +11,19 @@ declare global {
   }
 }
 
-window.WinBox = WinBox;
+// Make WinBox globally available for the service
+// Ensure it's available when DOM is ready
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'loading') {
+    // DOM is still loading, wait for it to be ready
+    window.addEventListener('DOMContentLoaded', () => {
+      window.WinBox = WinBox;
+    });
+  } else {
+    // DOM is already loaded, assign immediately
+    window.WinBox = WinBox;
+  }
+}
 
 import { createApp } from 'vue';
 import './styles/index.css';
