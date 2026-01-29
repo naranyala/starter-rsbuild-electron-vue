@@ -18,7 +18,7 @@ export default defineConfig({
   },
   output: {
     distPath: {
-      root: './build',
+      root: './build', // Output to build directory for electron-builder compatibility
     },
     cleanDistPath: true, // Clean build directory before each build
     copy: [

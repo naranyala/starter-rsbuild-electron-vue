@@ -4,47 +4,48 @@ A modern Electron + Vue.js boilerplate using Rsbuild and Bun runtime. This start
 
 ## Features
 
-- **Fast Bundling**: Powered by Rsbuild for lightning-fast builds
-- **Vue 3**: Latest Vue.js with Composition API support
-- **Electron Integration**: Desktop application packaging (runtime dependency moved to devDependencies for production builds)
-- **TypeScript Ready**: Full type safety
-- **Modern Styling**: Dark mode friendly UI
-- **Development Tools**: Hot reloading and debugging support
-- **Optimized Builds**: Tree-shaking and code splitting
+- Fast Bundling: Powered by Rsbuild for lightning-fast builds
+- Vue 3: Latest Vue.js with Composition API support
+- Electron Integration: Desktop application packaging (runtime dependency moved to devDependencies for production builds)
+- TypeScript Ready: Full type safety
+- Modern Styling: Dark mode friendly UI
+- Development Tools: Hot reloading and debugging support
+- Optimized Builds: Tree-shaking and code splitting
 
 ## Tech Stack
 
-- **Framework**: Vue.js 3 (Composition API)
-- **Bundler**: Rsbuild
-- **Runtime**: Bun (fast JavaScript runtime)
-- **Desktop**: Electron (runtime dependency moved to devDependencies for production builds)
-- **Styling**: CSS with variables and responsive design
-- **Type Checking**: TypeScript
-- **Code Quality**: Biome (formatter, linter)
+- Framework: Vue.js 3 (Composition API)
+- Bundler: Rsbuild (configuration in root directory)
+- Runtime: Bun (fast JavaScript runtime)
+- Desktop: Electron (runtime dependency moved to devDependencies for production builds)
+- Styling: CSS with variables and responsive design
+- Type Checking: TypeScript
+- Code Quality: Biome (formatter, linter)
 
 ## Project Structure
 
 ```
 starter-rsbuild-electron-vue/
-├── scripts/                 # Build and development scripts
-│   ├── build.mjs           # Production build script
-│   └── rsbuild.config.js   # Rsbuild configuration
-├── src/                    # Source code
-│   ├── lib/                # Library files
-│   ├── renderer/           # Vue application source
-│   │   ├── assets/         # Static assets (icons, images)
-│   │   ├── components/     # Vue components
-│   │   ├── lib/            # Utility libraries
-│   │   ├── styles/         # CSS styles
-│   │   ├── App.vue         # Main application component
-│   │   ├── index.html      # HTML template
-│   │   └── main.js         # Entry point
-│   ├── main-dev.cjs        # Electron main process (development)
-│   ├── main.cjs            # Electron main process (production)
-│   └── preload.cjs         # Electron preload script
-├── build/                  # Production build output
-├── package.json            # Dependencies and scripts
-└── README.md               # This file
+├── rsbuild.config.js           # Rsbuild configuration
+├── scripts/                    # Build and development scripts
+│   └── build.mjs              # Build script
+├── src/                        # Source code
+│   ├── lib/                    # Library files
+│   ├── renderer/               # Vue application source
+│   │   ├── assets/             # Static assets (icons, images)
+│   │   ├── components/         # Vue components
+│   │   ├── lib/                # Utility libraries
+│   │   ├── styles/             # CSS styles
+│   │   ├── App.vue             # Main application component
+│   │   ├── index.html          # HTML template
+│   │   └── main.js             # Entry point
+│   ├── main-dev.cjs            # Electron main process (development)
+│   ├── main.cjs                # Electron main process (production)
+│   └── preload.cjs             # Electron preload script
+├── build/                      # Temporary build output (for running app)
+├── dist/                       # Production distribution output
+├── package.json                # Project metadata, scripts, and Electron main entry point
+└── README.md                   # This file
 ```
 
 ## Prerequisites
@@ -107,23 +108,24 @@ bun run build
 This command will:
 - Clean the previous build directory
 - Bundle the application using Rsbuild
-- Copy necessary assets to the build directory
+- Copy necessary assets to the build directory for running the app locally
 
-Note: The production build has been tested and works correctly, creating all necessary files in the ./build directory.
+Note: The production build has been tested and works correctly, creating all necessary files in the ./build directory for local execution.
 
 ### Creating Distribution Packages
 
 ```bash
-# Create distributable packages (AppImage, deb, msi, etc.)
+# Create distributable packages (AppImage, etc.)
 bun run dist
 ```
 
 This command will:
 - Run the build process
 - Package the application using electron-builder
-- Generate platform-specific installers
+- Generate platform-specific installers in the ./dist directory
+- Clean up the intermediate ./build directory after packaging
 
-Note: On some Linux distributions, the .deb packaging may fail due to system library dependencies (such as libcrypt.so.1). The AppImage format will still be created successfully and is the recommended distribution format for Linux systems.
+Note: On some Linux distributions, the .deb packaging may fail due to system library dependencies (such as libcrypt.so.1). The AppImage format will still be created successfully and is the recommended distribution format for Linux systems. After packaging, only the ./dist directory will remain.
 
 ## Available Scripts
 
@@ -131,17 +133,17 @@ Note: On some Linux distributions, the .deb packaging may fail due to system lib
 |--------|-------------|
 | `dev` | Start development server with Electron app |
 | `dev:electron` | Start the Electron development environment |
-| `build` | Build application for production |
-| `build:frontend` | Build frontend only |
-| `dist` | Create distributable packages |
-| `start` | Start the built Electron application |
+| `build` | Build application for production (output to ./build) |
+| `build:frontend` | Build frontend only (output to ./build) |
+| `dist` | Create distributable packages (output to ./dist, cleans ./build) |
+| `start` | Start the built Electron application (requires ./build from 'bun run build') |
 | `lint` | Check code for linting errors |
 | `lint:fix` | Automatically fix linting errors |
 | `format` | Format code with Biome |
 
 ## Configuration Files
 
-- `scripts/rsbuild.config.js` - Rsbuild configuration
+- `rsbuild.config.js` - Rsbuild configuration (in root directory)
 - `tsconfig.json` - TypeScript configuration
 - `biome.json` - Biome formatter and linter configuration
 - `package.json` - Project metadata, scripts, and Electron main entry point
@@ -156,12 +158,12 @@ The project includes a sophisticated window management system using WinBox, allo
 - Multiple window instances
 
 ### Services
-- **WinBox Service**: Manages desktop-like windows within the application
-- **Window Content Generator**: Creates dynamic content for windows
+- WinBox Service: Manages desktop-like windows within the application
+- Window Content Generator: Creates dynamic content for windows
 
 ### Composables
-- **useDarkMode**: Toggle between light and dark themes
-- **useWindows**: Manage multiple windows in the application
+- useDarkMode: Toggle between light and dark themes
+- useWindows: Manage multiple windows in the application
 
 ## Environment
 
