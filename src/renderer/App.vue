@@ -40,7 +40,7 @@ import './styles/App.css';
 import 'winbox/dist/css/winbox.min.css';
 import WinBox from 'winbox/src/js/winbox';
 import { menuData } from './lib/menu-data';
-import { generateTheme, generateWindowContent } from './lib/window-generator';
+import { useCaseComponentObjects } from './use-cases';
 
 export default {
   name: 'App',
@@ -142,30 +142,16 @@ export default {
       return processedTitle.matches ? processedTitle.highlightedText : title;
     },
 
-    handleCardClick(card, index) {
-      const { title, content } = card;
+    async handleCardClick(card, index) {
+      const { id, title } = card;
 
-      // Define different themes for variety
-      const themes = [
-        { name: 'blue', bg: '#4a6cf7', color: 'white' },
-        { name: 'green', bg: '#4ade80', color: 'black' },
-        { name: 'purple', bg: '#a78bfa', color: 'white' },
-        { name: 'red', bg: '#f87171', color: 'white' },
-        { name: 'yellow', bg: '#fbbf24', color: 'black' },
-        { name: 'indigo', bg: '#6366f1', color: 'white' },
-      ];
+      // Generate theme based on the title
+      const windowTheme = this.generateTheme(title);
 
-      // Select a theme based on the index to have consistent colors
-      const theme = themes[index % themes.length];
-
-      // Generate dynamic content and theme based on the title
-      const dynamicContent = generateWindowContent(title);
-      const windowTheme = generateTheme(title);
-
-      // Create a WinBox window with the generated content
+      // Create a WinBox window with an empty container
       const winbox = new WinBox({
         title: title,
-        html: `<div class="winbox-content"><h3 style="color: ${windowTheme.color};">${title}</h3><div style="color: ${windowTheme.color};" class="winbox-dynamic-content">Loading content...</div></div>`,
+        html: `<div class="winbox-content-container" style="width: 100%; height: 100%;"></div>`,
         width: '500px',
         height: '400px',
         x: 'center',
@@ -175,20 +161,72 @@ export default {
         border: 4,
       });
 
-      // Set the content after the window is created using WinBox's body property
-      setTimeout(() => {
-        if (winbox && winbox.body) {
-          const contentDiv = winbox.body.querySelector(
-            '.winbox-dynamic-content'
-          );
-          if (contentDiv) {
-            contentDiv.innerHTML = dynamicContent;
-          } else {
-            // If we can't find the specific div, replace all content in the body
-            winbox.body.innerHTML = `<div class="winbox-content"><h3 style="color: ${windowTheme.color};">${title}</h3><div style="color: ${windowTheme.color};">${dynamicContent}</div></div>`;
+      // Dynamically import and mount the component after the window is created
+      try {
+        const componentModule = await useCaseComponentObjects[id]();
+        const ComponentConstructor = componentModule.default;
+
+        // Wait a bit for the window to be fully created
+        setTimeout(async () => {
+          if (winbox && winbox.body) {
+            // Create a container element for the Vue component
+            const container = winbox.body.querySelector(
+              '.winbox-content-container'
+            );
+
+            if (container) {
+              // Create a temporary Vue instance to render the component
+              const tempDiv = document.createElement('div');
+              container.appendChild(tempDiv);
+
+              // Import Vue to create the component instance
+              const { createApp } = await import('vue');
+
+              // Create the component with props
+              const app = createApp(ComponentConstructor, {
+                title: title,
+              });
+
+              // Mount the component
+              app.mount(tempDiv);
+            }
           }
-        }
-      }, 10);
+        }, 10);
+      } catch (error) {
+        console.error(`Failed to load component for card ID: ${id}`, error);
+
+        // Fallback: show an error message in the window
+        setTimeout(() => {
+          if (winbox && winbox.body) {
+            winbox.body.innerHTML = `<div class="winbox-content"><h3 style="color: white;">Error</h3><p style="color: white;">Could not load content for "${title}".</p></div>`;
+          }
+        }, 10);
+      }
+    },
+
+    generateTheme(title) {
+      const lowerTitle = title.toLowerCase();
+      const themes = [
+        { name: 'blue', bg: '#4a6cf7', color: 'white' },
+        { name: 'green', bg: '#4ade80', color: 'black' },
+        { name: 'purple', bg: '#a78bfa', color: 'white' },
+        { name: 'red', bg: '#f87171', color: 'white' },
+        { name: 'yellow', bg: '#fbbf24', color: 'black' },
+        { name: 'indigo', bg: '#6366f1', color: 'white' },
+        { name: 'pink', bg: '#ec4899', color: 'white' },
+        { name: 'teal', bg: '#14b8a6', color: 'white' },
+        { name: 'orange', bg: '#f97316', color: 'white' },
+        { name: 'gray', bg: '#6b7280', color: 'white' },
+      ];
+
+      // Create a simple hash of the title to consistently select the same theme for the same title
+      let hash = 0;
+      for (let i = 0; i < lowerTitle.length; i++) {
+        hash = lowerTitle.charCodeAt(i) + ((hash << 5) - hash);
+      }
+
+      const index = Math.abs(hash) % themes.length;
+      return themes[index];
     },
   },
 };

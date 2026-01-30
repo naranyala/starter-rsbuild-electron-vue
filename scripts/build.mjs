@@ -45,7 +45,7 @@ function buildFrontend() {
 
   execSync(`${rsbuildPath} build --config rsbuild.config.js`, {
     stdio: 'inherit',
-    env: { ...process.env, NODE_ENV: 'production' }
+    env: { ...process.env, NODE_ENV: 'production' },
   });
 
   console.log('✅ Frontend build completed!');
@@ -75,7 +75,7 @@ function buildElectron(shouldPackage = false) {
       try {
         execSync(`${electronBuilderPath}`, {
           stdio: 'inherit',
-          env: { ...process.env, NODE_ENV: 'production' }
+          env: { ...process.env, NODE_ENV: 'production' },
         });
       } finally {
         // Clean up the build directory since it's no longer needed after packaging
@@ -85,17 +85,23 @@ function buildElectron(shouldPackage = false) {
         }
       }
     } else {
-      console.log('⚠️  electron-builder not found. Install with: bun install electron-builder');
+      console.log(
+        '⚠️  electron-builder not found. Install with: bun install electron-builder'
+      );
     }
   } else {
     // For non-packaged builds, we still need the build directory for running the app
-    console.log('📁 Built files are located in the ./build directory for running');
+    console.log(
+      '📁 Built files are located in the ./build directory for running'
+    );
   }
 
   console.log('🎉 Electron app build completed!');
   if (shouldPackage) {
     console.log('📁 Packaged files are located in the ./dist directory');
-    console.log('🎮 To run the packaged app, execute the generated executable in ./dist');
+    console.log(
+      '🎮 To run the packaged app, execute the generated executable in ./dist'
+    );
   } else {
     console.log('📁 Built files are located in the ./build directory');
     console.log('🎮 To run the app, use: bun run start');
@@ -116,62 +122,68 @@ function startDevWeb() {
 
   execSync(`${rsbuildPath} dev --config rsbuild.config.js`, {
     stdio: 'inherit',
-    env: { ...process.env, NODE_ENV: 'development' }
+    env: { ...process.env, NODE_ENV: 'development' },
   });
 }
 
 // Start Electron development environment
 function startDevElectron() {
   console.log('🔧 Starting Electron development environment...');
-  
+
   checkNodeModules();
-  
+
   const rsbuildPath = getRsbuildPath();
   if (!fs.existsSync(rsbuildPath)) {
     console.error('❌ Rsbuild not found. Please install dependencies first.');
     process.exit(1);
   }
-  
+
   // Start Rsbuild dev server
-  const devServer = spawn(rsbuildPath, ['dev', '--config', 'rsbuild.config.js'], {
-    stdio: 'inherit',
-    env: { ...process.env, NODE_ENV: 'development' },
-  });
-  
+  const devServer = spawn(
+    rsbuildPath,
+    ['dev', '--config', 'rsbuild.config.js'],
+    {
+      stdio: 'inherit',
+      env: { ...process.env, NODE_ENV: 'development' },
+    }
+  );
+
   // Wait a bit for the dev server to start, then launch Electron
   setTimeout(() => {
     const electronPath = getElectronPath();
     if (!fs.existsSync(electronPath)) {
-      console.error('❌ Electron not found. Please install dependencies first.');
+      console.error(
+        '❌ Electron not found. Please install dependencies first.'
+      );
       process.exit(1);
     }
-    
+
     console.log('📱 Launching Electron app pointing to development server...');
-    
+
     const electronProcess = spawn(electronPath, ['src/main-dev.cjs'], {
       stdio: 'inherit',
       env: {
         ...process.env,
         NODE_ENV: 'development',
-        ELECTRON_DEV_SERVER: 'http://localhost:3000'
+        ELECTRON_DEV_SERVER: 'http://localhost:3000',
       },
     });
-    
-    electronProcess.on('close', (code) => {
+
+    electronProcess.on('close', code => {
       console.log(`Electron process exited with code ${code}`);
     });
-    
-    electronProcess.on('error', (err) => {
+
+    electronProcess.on('error', err => {
       console.error('Electron process error:', err.message);
     });
   }, 3000);
-  
-  devServer.on('close', (code) => {
+
+  devServer.on('close', code => {
     console.log(`Development server exited with code ${code}`);
     process.exit(code);
   });
-  
-  devServer.on('error', (err) => {
+
+  devServer.on('error', err => {
     console.error('Development server error:', err.message);
   });
 }
@@ -207,12 +219,12 @@ function startElectronApp() {
     env: process.env,
   });
 
-  electronProcess.on('close', (code) => {
+  electronProcess.on('close', code => {
     console.log(`Electron process exited with code ${code}`);
     process.exit(code);
   });
 
-  electronProcess.on('error', (err) => {
+  electronProcess.on('error', err => {
     console.error('Electron process error:', err.message);
   });
 }
@@ -227,11 +239,11 @@ switch (command) {
     const shouldPackage = extraArgs.includes('--package');
     buildElectron(shouldPackage);
     break;
-    
+
   case 'build:frontend':
     buildFrontend();
     break;
-    
+
   case 'dev':
     startDevElectron();
     break;
@@ -239,18 +251,30 @@ switch (command) {
   case 'dev:electron':
     startDevElectron();
     break;
-    
+
   case 'start':
     startElectronApp();
     break;
-    
+
   default:
     console.log('Usage:');
-    console.log('  node scripts/build.mjs build              # Build full Electron app');
-    console.log('  node scripts/build.mjs build --package    # Build and package Electron app');
-    console.log('  node scripts/build.mjs build:frontend     # Build frontend only');
-    console.log('  node scripts/build.mjs dev                # Start Electron dev environment');
-    console.log('  node scripts/build.mjs dev:electron       # Start Electron dev environment');
-    console.log('  node scripts/build.mjs start              # Start built Electron app');
+    console.log(
+      '  node scripts/build.mjs build              # Build full Electron app'
+    );
+    console.log(
+      '  node scripts/build.mjs build --package    # Build and package Electron app'
+    );
+    console.log(
+      '  node scripts/build.mjs build:frontend     # Build frontend only'
+    );
+    console.log(
+      '  node scripts/build.mjs dev                # Start Electron dev environment'
+    );
+    console.log(
+      '  node scripts/build.mjs dev:electron       # Start Electron dev environment'
+    );
+    console.log(
+      '  node scripts/build.mjs start              # Start built Electron app'
+    );
     process.exit(1);
 }

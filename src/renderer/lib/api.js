@@ -28,12 +28,18 @@ export class HttpClient {
     const requestOptions = { ...this.defaultOptions, ...options };
 
     // Merge headers
-    requestOptions.headers = { ...this.defaultOptions.headers, ...options.headers };
+    requestOptions.headers = {
+      ...this.defaultOptions.headers,
+      ...options.headers,
+    };
 
     try {
       // Add timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), requestOptions.timeout);
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        requestOptions.timeout
+      );
 
       const response = await fetch(fullUrl, {
         ...requestOptions,

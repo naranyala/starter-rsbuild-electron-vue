@@ -21,9 +21,7 @@ export default defineConfig({
       root: './build', // Output to build directory for electron-builder compatibility
     },
     cleanDistPath: true, // Clean build directory before each build
-    copy: [
-      { from: './src/renderer/assets', to: 'assets/' },
-    ],
+    copy: [{ from: './src/renderer/assets', to: 'assets/' }],
   },
   server: {
     port: 3000, // Default port, will be overridden in dev server

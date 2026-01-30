@@ -128,15 +128,21 @@ export function generateWindowContent(title: string): string {
 
   // Select 2-4 random templates from the category for varied content
   const selectedTemplates: string[] = [];
-  const numParagraphs = Math.min(templates.length, Math.max(2, Math.floor(Math.random() * 3) + 2)); // 2-4 paragraphs
+  const numParagraphs = Math.min(
+    templates.length,
+    Math.max(2, Math.floor(Math.random() * 3) + 2)
+  ); // 2-4 paragraphs
 
   // Make sure we don't pick the same template twice
   const usedIndices = new Set<number>();
   for (let i = 0; i < numParagraphs; i++) {
-    let randomIndex;
+    let randomIndex: number;
     do {
       randomIndex = Math.floor(Math.random() * templates.length);
-    } while (usedIndices.has(randomIndex) && usedIndices.size < templates.length);
+    } while (
+      usedIndices.has(randomIndex) &&
+      usedIndices.size < templates.length
+    );
 
     usedIndices.add(randomIndex);
     selectedTemplates.push(templates[randomIndex]);
@@ -157,7 +163,8 @@ export function generateWindowContent(title: string): string {
   ];
 
   // Select a random section
-  const randomSection = additionalSections[Math.floor(Math.random() * additionalSections.length)];
+  const randomSection =
+    additionalSections[Math.floor(Math.random() * additionalSections.length)];
 
   // Combine all content
   const combinedContent = [

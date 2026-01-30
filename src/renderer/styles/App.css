@@ -7,23 +7,23 @@
 
 /* Force dark theme by default */
 body {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* Prevent any light theme overrides */
 html,
 body {
-  color-scheme: dark !important;
+  color-scheme: dark;
 }
 
 /* Ensure all inputs use dark theme */
 input,
 textarea,
 select {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
 /* Ensure scrollbar is dark themed */
@@ -332,69 +332,69 @@ select {
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
     "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   line-height: 1.6;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
+  background: transparent;
+  border: none;
+  outline: none;
 }
 
 /* WinBox window fixes */
 .wb-body {
-  padding: 0 !important;
-  background: transparent !important;
+  padding: 0;
+  background: transparent;
 }
 
 /* Dark theme WinBox windows */
 .wb.dark-theme {
-  background: var(--bg-primary) !important;
+  background: var(--bg-primary);
 }
 
 .wb.dark-theme .wb-header {
-  background: var(--bg-secondary) !important;
-  border-bottom: 1px solid var(--border-color) !important;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .wb.dark-theme .wb-title {
-  color: var(--text-primary) !important;
+  color: var(--text-primary);
 }
 
 .wb.dark-theme .wb-control {
-  background: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .wb.dark-theme .wb-control:hover {
-  background: var(--accent-color) !important;
+  background: var(--accent-color);
 }
 
 .wb-control {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-radius: 4px !important;
-  transition: background 0.2s ease !important;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  transition: background 0.2s ease;
 }
 
 .wb-control:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .wb-drag {
-  cursor: move !important;
-  user-select: none !important;
+  cursor: move;
+  user-select: none;
 }
 
 .wb-full {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .wb-min {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .wb-max {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .wb-close {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .winbox-content h3 {

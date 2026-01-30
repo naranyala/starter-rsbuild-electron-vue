@@ -10,6 +10,7 @@ const {
   setupWindowHandlers,
 } = require('./lib/window-utils.cjs');
 const { registerAppHandlers } = require('./lib/ipc-utils.cjs');
+const { registerAllUseCaseHandlers } = require('./main/use-cases/index.cjs');
 
 const args = process.argv.slice(1);
 const serve = args.some(val => val === '--start-dev');
@@ -77,6 +78,9 @@ function createMainWindow() {
 function registerIpcHandlers() {
   // Register common app handlers
   registerAppHandlers();
+
+  // Register use case handlers
+  registerAllUseCaseHandlers();
 
   // Basic ping handler
   ipcMain.handle('ping', () => 'pong');

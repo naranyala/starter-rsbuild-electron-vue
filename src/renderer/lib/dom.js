@@ -30,7 +30,7 @@ export class DOMUtils {
     });
 
     // Add children
-    children.forEach((child) => {
+    children.forEach(child => {
       if (typeof child === 'string') {
         element.appendChild(document.createTextNode(child));
       } else if (child instanceof HTMLElement) {
@@ -124,12 +124,12 @@ export class AnimationUtils {
    * @returns {Promise} Animation promise
    */
   static fadeIn(element, duration = 300) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       element.style.opacity = '0';
       element.style.display = 'block';
 
       const start = performance.now();
-      const animate = (currentTime) => {
+      const animate = currentTime => {
         const elapsed = currentTime - start;
         const progress = Math.min(elapsed / duration, 1);
 
@@ -153,9 +153,9 @@ export class AnimationUtils {
    * @returns {Promise} Animation promise
    */
   static fadeOut(element, duration = 300) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const start = performance.now();
-      const animate = (currentTime) => {
+      const animate = currentTime => {
         const elapsed = currentTime - start;
         const progress = Math.min(elapsed / duration, 1);
 
@@ -180,12 +180,12 @@ export class AnimationUtils {
    * @returns {Promise} Animation promise
    */
   static slideInFromTop(element, duration = 300) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       element.style.transform = 'translateY(-100%)';
       element.style.display = 'block';
 
       const start = performance.now();
-      const animate = (currentTime) => {
+      const animate = currentTime => {
         const elapsed = currentTime - start;
         const progress = Math.min(elapsed / duration, 1);
 

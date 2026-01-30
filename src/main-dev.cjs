@@ -28,6 +28,7 @@ const {
 } = require('./lib/filesystem-utils.cjs');
 const { registerHandler, registerAppHandlers } = require('./lib/ipc-utils.cjs');
 const { executeCommand } = require('./lib/process-utils.cjs');
+const { registerAllUseCaseHandlers } = require('./main/use-cases/index.cjs');
 
 // Security settings
 app.on('web-contents-created', (event, contents) => {
@@ -290,6 +291,9 @@ function registerIpcHandlers() {
 
   // Register common app handlers
   registerAppHandlers();
+
+  // Register use case handlers
+  registerAllUseCaseHandlers();
 }
 
 // This method will be called when Electron has finished initialization

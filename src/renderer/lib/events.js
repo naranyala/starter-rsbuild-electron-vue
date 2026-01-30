@@ -67,7 +67,7 @@ export class EventEmitter {
   emit(event, ...args) {
     if (!this.events.has(event)) return;
 
-    this.events.get(event).forEach((handler) => {
+    this.events.get(event).forEach(handler => {
       try {
         handler(...args);
       } catch (error) {
@@ -149,7 +149,13 @@ export class KeyboardUtils {
    * @returns {boolean} Whether shortcut matches
    */
   static isShortcut(event, shortcut) {
-    const { key, ctrl = false, shift = false, alt = false, meta = false } = shortcut;
+    const {
+      key,
+      ctrl = false,
+      shift = false,
+      alt = false,
+      meta = false,
+    } = shortcut;
 
     return (
       KeyboardUtils.isKey(event, key) &&
@@ -185,7 +191,9 @@ export function throttle(func, limit) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
+      setTimeout(() => {
+        inThrottle = false;
+      }, limit);
     }
   };
 }
