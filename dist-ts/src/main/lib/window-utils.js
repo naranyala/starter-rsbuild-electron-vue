@@ -2,10 +2,10 @@
  * Enhanced Window Management Utilities for Electron Main Process
  * These utilities help with managing BrowserWindow instances
  */
-import { BrowserWindow, screen, dialog, shell, Menu, Tray, nativeImage } from 'electron';
+import { BrowserWindow, dialog, Menu, nativeImage, screen, shell, Tray, } from 'electron';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -74,7 +74,8 @@ export function createWindow(options = {}) {
             webSecurity: true,
             allowRunningInsecureContent: false,
             experimentalFeatures: false,
-            preload: path.join(__dirname, '../dist-ts/preload.js'),
+            preload: path.join(__dirname, '../preload.js'),
+            sandbox: false,
         },
         frame: true,
         show: false, // Show only when ready
@@ -107,13 +108,39 @@ export function createDevWindow(options = {}) {
 /**
  * Load URL into window with dev/reload handling
  * @param window - Window instance
- * @param port - Development server port
+ * @param port - Development server port (used if devServerUrl is not provided)
  * @param isDev - Whether in development mode
- * @param devServerUrl - Custom dev server URL
+ * @param devServerUrl - Custom dev server URL (takes precedence over port)
  */
 export function loadUrl(window, port = 3000, isDev = false, devServerUrl = null) {
-    const startUrl = devServerUrl || (isDev ? `http://localhost:${port}` : `file://${path.join(__dirname, '../../../build/index.html')}`);
-    window.loadURL(startUrl);
+    let startUrl;
+    if (devServerUrl) {
+        startUrl = devServerUrl;
+    }
+    else if (isDev) {
+        startUrl = `http://localhost:${port}`;
+    }
+    else {
+        startUrl = `file://${path.join(__dirname, '../../../build/index.html')}`;
+    }
+    console.log(`Loading URL: ${startUrl}`);
+    window
+        .loadURL(startUrl)
+        .then(() => {
+        console.log('URL loaded successfully');
+    })
+        .catch(err => {
+        console.error('Failed to load URL:', err.message);
+    });
+    window.webContents.on('console-message', (_event, _level, message, _line, _sourceId) => {
+        console.log(`[Renderer] ${message}`);
+    });
+    window.webContents.on('render-process-gone', (_event, details) => {
+        console.error('Render process gone:', details.reason);
+    });
+    window.webContents.on('unresponsive', () => {
+        console.warn('Window became unresponsive');
+    });
 }
 /**
  * Setup window event handlers
@@ -130,7 +157,8 @@ export function setupWindowHandlers(window, isDev = false, options = {}) {
             onReady(window);
     });
     // Open DevTools in development (only if explicitly enabled)
-    if (isDev && process.env.OPEN_DEVTOOLS === 'true') {
+    if (isDev &&
+        (process.env.OPEN_DEVTOOLS === 'true' || process.env.OPEN_DEVTOOLS === '1')) {
         window.webContents.openDevTools({ mode: 'detach' });
     }
     // Handle window close event
@@ -151,17 +179,20 @@ export function setupWindowHandlers(window, isDev = false, options = {}) {
         if (onResponsive)
             onResponsive(window);
     });
-    // Handle navigation events
+    // Handle navigation events - allow localhost, file://, devtools:// and chrome://
     window.webContents.session.webRequest.onBeforeRequest((details, callback) => {
         try {
             const parsedUrl = new URL(details.url);
-            if (parsedUrl.origin !== 'http://localhost:3000' &&
-                !parsedUrl.protocol.includes('file:')) {
-                callback({ cancel: true });
-                shell.openExternal(details.url);
+            // Allow all localhost origins (any port), file:// protocol, devtools:// and chrome://
+            if (parsedUrl.hostname === 'localhost' ||
+                parsedUrl.protocol.includes('file:') ||
+                parsedUrl.protocol.includes('devtools:') ||
+                parsedUrl.protocol.includes('chrome:')) {
+                callback({});
             }
             else {
-                callback({});
+                callback({ cancel: true });
+                shell.openExternal(details.url);
             }
         }
         catch (error) {
@@ -425,10 +456,10 @@ export class WindowManager {
      */
     static create(name, options = {}) {
         const window = createWindow({ ...options, name });
-        this.windows.set(name, window);
+        WindowManager.windows.set(name, window);
         // Clean up when window is closed
         window.on('closed', () => {
-            this.windows.delete(name);
+            WindowManager.windows.delete(name);
         });
         return window;
     }
@@ -438,14 +469,14 @@ export class WindowManager {
      * @returns Window instance or null
      */
     static get(name) {
-        return this.windows.get(name) || null;
+        return WindowManager.windows.get(name) || null;
     }
     /**
      * Get all registered windows
      * @returns Map of all windows
      */
     static getAll() {
-        return new Map(this.windows);
+        return new Map(WindowManager.windows);
     }
     /**
      * Close a registered window
@@ -453,7 +484,7 @@ export class WindowManager {
      * @returns True if successful
      */
     static close(name) {
-        const window = this.windows.get(name);
+        const window = WindowManager.windows.get(name);
         if (window) {
             window.close();
             return true;
@@ -464,12 +495,12 @@ export class WindowManager {
      * Close all registered windows
      */
     static closeAll() {
-        for (const [name, window] of this.windows) {
+        for (const [name, window] of WindowManager.windows) {
             if (!window.isDestroyed()) {
                 window.close();
             }
         }
-        this.windows.clear();
+        WindowManager.windows.clear();
     }
     /**
      * Focus a registered window
@@ -477,7 +508,7 @@ export class WindowManager {
      * @returns True if successful
      */
     static focus(name) {
-        const window = this.windows.get(name);
+        const window = WindowManager.windows.get(name);
         if (window && !window.isDestroyed()) {
             window.focus();
             return true;
@@ -490,7 +521,7 @@ export class WindowManager {
      * @returns True if successful
      */
     static show(name) {
-        const window = this.windows.get(name);
+        const window = WindowManager.windows.get(name);
         if (window && !window.isDestroyed()) {
             showWindow(window);
             return true;
@@ -503,7 +534,7 @@ export class WindowManager {
      * @returns True if successful
      */
     static hide(name) {
-        const window = this.windows.get(name);
+        const window = WindowManager.windows.get(name);
         if (window && !window.isDestroyed()) {
             hideWindow(window);
             return true;
@@ -517,7 +548,7 @@ export class WindowManager {
      * @returns True if successful
      */
     static reload(name, ignoreCache = false) {
-        const window = this.windows.get(name);
+        const window = WindowManager.windows.get(name);
         if (window && !window.isDestroyed()) {
             reloadWindow(window, ignoreCache);
             return true;
@@ -554,7 +585,7 @@ export class DialogManager {
      * @returns Promise with button index
      */
     static async showInfo(message, detail) {
-        return await this.showMessage({
+        return await DialogManager.showMessage({
             type: 'info',
             message,
             detail,
@@ -568,7 +599,7 @@ export class DialogManager {
      * @returns Promise with confirmation result
      */
     static async showConfirmation(message, detail) {
-        const result = await this.showMessage({
+        const result = await DialogManager.showMessage({
             type: 'question',
             message,
             detail,
@@ -598,7 +629,7 @@ export class MenuManager {
      * @param y - Y coordinate
      */
     static showContextMenu(template, window, x, y) {
-        const menu = this.createContextMenu(template);
+        const menu = MenuManager.createContextMenu(template);
         menu.popup({ window, x, y });
     }
     /**

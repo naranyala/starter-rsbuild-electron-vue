@@ -3,18 +3,28 @@
  * These utilities help with managing BrowserWindow instances
  */
 
-import { BrowserWindow, screen, dialog, shell, Menu, Tray, nativeImage, ipcMain } from 'electron';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import {
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  nativeImage,
+  screen,
+  shell,
+  Tray,
+} from 'electron';
 import * as os from 'os';
+import * as path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Define types for our utilities
-export interface WindowOptions extends Electron.BrowserWindowConstructorOptions {
+export interface WindowOptions
+  extends Electron.BrowserWindowConstructorOptions {
   name?: string;
 }
 
@@ -88,7 +98,8 @@ export function getAllWindows(): Map<number, WindowData> {
  */
 export function createWindow(options: WindowOptions = {}): BrowserWindow {
   const primaryDisplay = screen.getPrimaryDisplay();
-  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+  const { width: screenWidth, height: screenHeight } =
+    primaryDisplay.workAreaSize;
 
   const defaultOptions: WindowOptions = {
     width: Math.min(1200, screenWidth - 100),
@@ -103,7 +114,8 @@ export function createWindow(options: WindowOptions = {}): BrowserWindow {
       webSecurity: true,
       allowRunningInsecureContent: false,
       experimentalFeatures: false,
-      preload: path.join(__dirname, '../dist-ts/preload.js'),
+      preload: path.join(__dirname, '../preload.js'),
+      sandbox: false,
     },
     frame: true,
     show: false, // Show only when ready
@@ -142,9 +154,9 @@ export function createDevWindow(options: WindowOptions = {}): BrowserWindow {
 /**
  * Load URL into window with dev/reload handling
  * @param window - Window instance
- * @param port - Development server port
+ * @param port - Development server port (used if devServerUrl is not provided)
  * @param isDev - Whether in development mode
- * @param devServerUrl - Custom dev server URL
+ * @param devServerUrl - Custom dev server URL (takes precedence over port)
  */
 export function loadUrl(
   window: BrowserWindow,
@@ -152,9 +164,40 @@ export function loadUrl(
   isDev: boolean = false,
   devServerUrl: string | null = null
 ): void {
-  const startUrl = devServerUrl || (isDev ? `http://localhost:${port}` : `file://${path.join(__dirname, '../../../build/index.html')}`);
+  let startUrl: string;
 
-  window.loadURL(startUrl);
+  if (devServerUrl) {
+    startUrl = devServerUrl;
+  } else if (isDev) {
+    startUrl = `http://localhost:${port}`;
+  } else {
+    startUrl = `file://${path.join(__dirname, '../../../build/index.html')}`;
+  }
+
+  console.log(`Loading URL: ${startUrl}`);
+  window
+    .loadURL(startUrl)
+    .then(() => {
+      console.log('URL loaded successfully');
+    })
+    .catch(err => {
+      console.error('Failed to load URL:', err.message);
+    });
+
+  window.webContents.on(
+    'console-message',
+    (_event, _level, message, _line, _sourceId) => {
+      console.log(`[Renderer] ${message}`);
+    }
+  );
+
+  window.webContents.on('render-process-gone', (_event, details) => {
+    console.error('Render process gone:', details.reason);
+  });
+
+  window.webContents.on('unresponsive', () => {
+    console.warn('Window became unresponsive');
+  });
 }
 
 /**
@@ -177,7 +220,10 @@ export function setupWindowHandlers(
   });
 
   // Open DevTools in development (only if explicitly enabled)
-  if (isDev && process.env.OPEN_DEVTOOLS === 'true') {
+  if (
+    isDev &&
+    (process.env.OPEN_DEVTOOLS === 'true' || process.env.OPEN_DEVTOOLS === '1')
+  ) {
     window.webContents.openDevTools({ mode: 'detach' });
   }
 
@@ -199,18 +245,21 @@ export function setupWindowHandlers(
     if (onResponsive) onResponsive(window);
   });
 
-  // Handle navigation events
+  // Handle navigation events - allow localhost, file://, devtools:// and chrome://
   window.webContents.session.webRequest.onBeforeRequest((details, callback) => {
     try {
       const parsedUrl = new URL(details.url);
+      // Allow all localhost origins (any port), file:// protocol, devtools:// and chrome://
       if (
-        parsedUrl.origin !== 'http://localhost:3000' &&
-        !parsedUrl.protocol.includes('file:')
+        parsedUrl.hostname === 'localhost' ||
+        parsedUrl.protocol.includes('file:') ||
+        parsedUrl.protocol.includes('devtools:') ||
+        parsedUrl.protocol.includes('chrome:')
       ) {
+        callback({});
+      } else {
         callback({ cancel: true });
         shell.openExternal(details.url);
-      } else {
-        callback({});
       }
     } catch (error) {
       callback({ cancel: true });
@@ -312,7 +361,10 @@ export function getWindowBounds(window: BrowserWindow): Electron.Rectangle {
  * @param window - Window instance
  * @param bounds - Window bounds {x, y, width, height}
  */
-export function setWindowBounds(window: BrowserWindow, bounds: Electron.Rectangle): void {
+export function setWindowBounds(
+  window: BrowserWindow,
+  bounds: Electron.Rectangle
+): void {
   window.setBounds(bounds);
 }
 
@@ -336,7 +388,9 @@ export function getPrimaryDisplay(): Electron.Display {
  * Create application menu
  * @param template - Menu template
  */
-export function createMenu(template: Electron.MenuItemConstructorOptions[] | null = null): void {
+export function createMenu(
+  template: Electron.MenuItemConstructorOptions[] | null = null
+): void {
   const menu = template ? Menu.buildFromTemplate(template) : null;
   Menu.setApplicationMenu(menu);
 }
@@ -378,7 +432,10 @@ export function hideWindow(window: BrowserWindow): void {
  * @param window - Window to reload
  * @param ignoreCache - Whether to ignore cache
  */
-export function reloadWindow(window: BrowserWindow, ignoreCache: boolean = false): void {
+export function reloadWindow(
+  window: BrowserWindow,
+  ignoreCache: boolean = false
+): void {
   if (!window.isDestroyed()) {
     if (ignoreCache) {
       window.webContents.reloadIgnoringCache();
@@ -403,7 +460,19 @@ export function flashWindow(window: BrowserWindow, flag: boolean = true): void {
  * @param flag - Whether to set always on top
  * @param level - Level of priority
  */
-export function setAlwaysOnTop(window: BrowserWindow, flag: boolean = true, level?: 'normal' | 'floating' | 'torn-off-menu' | 'modal-panel' | 'main-menu' | 'status' | 'pop-up-menu' | 'screen-saver'): void {
+export function setAlwaysOnTop(
+  window: BrowserWindow,
+  flag: boolean = true,
+  level?:
+    | 'normal'
+    | 'floating'
+    | 'torn-off-menu'
+    | 'modal-panel'
+    | 'main-menu'
+    | 'status'
+    | 'pop-up-menu'
+    | 'screen-saver'
+): void {
   window.setAlwaysOnTop(flag, level);
 }
 
@@ -412,7 +481,10 @@ export function setAlwaysOnTop(window: BrowserWindow, flag: boolean = true, leve
  * @param window - Window to modify
  * @param flag - Whether to set fullscreen
  */
-export function setFullscreen(window: BrowserWindow, flag: boolean = true): void {
+export function setFullscreen(
+  window: BrowserWindow,
+  flag: boolean = true
+): void {
   window.setFullScreen(flag);
 }
 
@@ -439,7 +511,10 @@ export function setWindowTitle(window: BrowserWindow, title: string): void {
  * @param window - Window to modify
  * @param icon - Icon path or native image
  */
-export function setWindowIcon(window: BrowserWindow, icon: string | Electron.NativeImage): void {
+export function setWindowIcon(
+  window: BrowserWindow,
+  icon: string | Electron.NativeImage
+): void {
   window.setIcon(icon);
 }
 
@@ -448,7 +523,10 @@ export function setWindowIcon(window: BrowserWindow, icon: string | Electron.Nat
  * @param window - Window to modify
  * @param color - Background color
  */
-export function setWindowBackgroundColor(window: BrowserWindow, color: string): void {
+export function setWindowBackgroundColor(
+  window: BrowserWindow,
+  color: string
+): void {
   window.setBackgroundColor(color);
 }
 
@@ -468,14 +546,18 @@ export function setWindowOpacity(window: BrowserWindow, opacity: number): void {
  * @param menu - Context menu
  * @returns Tray instance
  */
-export function createTray(iconPath: string, tooltip: string, menu?: Electron.Menu): Tray {
+export function createTray(
+  iconPath: string,
+  tooltip: string,
+  menu?: Electron.Menu
+): Tray {
   const tray = new Tray(iconPath);
   tray.setToolTip(tooltip);
-  
+
   if (menu) {
     tray.setContextMenu(menu);
   }
-  
+
   return tray;
 }
 
@@ -493,7 +575,9 @@ export function createNativeImage(imagePath: string): Electron.NativeImage {
  * @param buffer - Image buffer
  * @returns Native image
  */
-export function createNativeImageFromBuffer(buffer: Buffer): Electron.NativeImage {
+export function createNativeImageFromBuffer(
+  buffer: Buffer
+): Electron.NativeImage {
   return nativeImage.createFromBuffer(buffer);
 }
 
@@ -511,11 +595,11 @@ export class WindowManager {
    */
   static create(name: string, options: WindowOptions = {}): BrowserWindow {
     const window = createWindow({ ...options, name });
-    this.windows.set(name, window);
+    WindowManager.windows.set(name, window);
 
     // Clean up when window is closed
     window.on('closed', () => {
-      this.windows.delete(name);
+      WindowManager.windows.delete(name);
     });
 
     return window;
@@ -527,7 +611,7 @@ export class WindowManager {
    * @returns Window instance or null
    */
   static get(name: string): BrowserWindow | null {
-    return this.windows.get(name) || null;
+    return WindowManager.windows.get(name) || null;
   }
 
   /**
@@ -535,7 +619,7 @@ export class WindowManager {
    * @returns Map of all windows
    */
   static getAll(): Map<string, BrowserWindow> {
-    return new Map(this.windows);
+    return new Map(WindowManager.windows);
   }
 
   /**
@@ -544,7 +628,7 @@ export class WindowManager {
    * @returns True if successful
    */
   static close(name: string): boolean {
-    const window = this.windows.get(name);
+    const window = WindowManager.windows.get(name);
     if (window) {
       window.close();
       return true;
@@ -556,12 +640,12 @@ export class WindowManager {
    * Close all registered windows
    */
   static closeAll(): void {
-    for (const [name, window] of this.windows) {
+    for (const [name, window] of WindowManager.windows) {
       if (!window.isDestroyed()) {
         window.close();
       }
     }
-    this.windows.clear();
+    WindowManager.windows.clear();
   }
 
   /**
@@ -570,7 +654,7 @@ export class WindowManager {
    * @returns True if successful
    */
   static focus(name: string): boolean {
-    const window = this.windows.get(name);
+    const window = WindowManager.windows.get(name);
     if (window && !window.isDestroyed()) {
       window.focus();
       return true;
@@ -584,7 +668,7 @@ export class WindowManager {
    * @returns True if successful
    */
   static show(name: string): boolean {
-    const window = this.windows.get(name);
+    const window = WindowManager.windows.get(name);
     if (window && !window.isDestroyed()) {
       showWindow(window);
       return true;
@@ -598,7 +682,7 @@ export class WindowManager {
    * @returns True if successful
    */
   static hide(name: string): boolean {
-    const window = this.windows.get(name);
+    const window = WindowManager.windows.get(name);
     if (window && !window.isDestroyed()) {
       hideWindow(window);
       return true;
@@ -613,7 +697,7 @@ export class WindowManager {
    * @returns True if successful
    */
   static reload(name: string, ignoreCache: boolean = false): boolean {
-    const window = this.windows.get(name);
+    const window = WindowManager.windows.get(name);
     if (window && !window.isDestroyed()) {
       reloadWindow(window, ignoreCache);
       return true;
@@ -631,7 +715,9 @@ export class DialogManager {
    * @param options - Message box options
    * @returns Promise with button index
    */
-  static async showMessage(options: Electron.MessageBoxOptions): Promise<Electron.MessageBoxReturnValue> {
+  static async showMessage(
+    options: Electron.MessageBoxOptions
+  ): Promise<Electron.MessageBoxReturnValue> {
     return await dialog.showMessageBox(options);
   }
 
@@ -651,8 +737,11 @@ export class DialogManager {
    * @param detail - Additional details
    * @returns Promise with button index
    */
-  static async showInfo(message: string, detail?: string): Promise<Electron.MessageBoxReturnValue> {
-    return await this.showMessage({
+  static async showInfo(
+    message: string,
+    detail?: string
+  ): Promise<Electron.MessageBoxReturnValue> {
+    return await DialogManager.showMessage({
       type: 'info',
       message,
       detail,
@@ -666,8 +755,11 @@ export class DialogManager {
    * @param detail - Additional details
    * @returns Promise with confirmation result
    */
-  static async showConfirmation(message: string, detail?: string): Promise<boolean> {
-    const result = await this.showMessage({
+  static async showConfirmation(
+    message: string,
+    detail?: string
+  ): Promise<boolean> {
+    const result = await DialogManager.showMessage({
       type: 'question',
       message,
       detail,
@@ -687,7 +779,9 @@ export class MenuManager {
    * @param template - Menu template
    * @returns Menu instance
    */
-  static createContextMenu(template: Electron.MenuItemConstructorOptions[]): Menu {
+  static createContextMenu(
+    template: Electron.MenuItemConstructorOptions[]
+  ): Menu {
     return Menu.buildFromTemplate(template);
   }
 
@@ -704,7 +798,7 @@ export class MenuManager {
     x?: number,
     y?: number
   ): void {
-    const menu = this.createContextMenu(template);
+    const menu = MenuManager.createContextMenu(template);
     menu.popup({ window, x, y });
   }
 
@@ -712,7 +806,9 @@ export class MenuManager {
    * Create a system menu
    * @param template - Menu template
    */
-  static setSystemMenu(template: Electron.MenuItemConstructorOptions[] | null): void {
+  static setSystemMenu(
+    template: Electron.MenuItemConstructorOptions[] | null
+  ): void {
     const menu = template ? Menu.buildFromTemplate(template) : null;
     Menu.setApplicationMenu(menu);
   }

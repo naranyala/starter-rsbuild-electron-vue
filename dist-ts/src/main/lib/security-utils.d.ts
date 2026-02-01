@@ -33,6 +33,7 @@ export declare function configureSecuritySession(options?: {
     enableNodeIntegration?: boolean;
     enableContextIsolation?: boolean;
     enableExperimentalFeatures?: boolean;
+    isDevelopment?: boolean;
 }): void;
 /**
  * Validate URL security

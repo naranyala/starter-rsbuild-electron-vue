@@ -11,19 +11,19 @@ import {
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { registerAllHandlers } from './main/handlers/index.js';
+// ProcessService is not a class in process-utils, using the functions directly
+import {
+  executeCommand as ProcessService_executeCommand,
+  killProcess as ProcessService_killProcess,
+  spawnProcess as ProcessService_spawnProcess,
+} from './main/lib/process-utils.js';
 import { AppService } from './main/services/app-service.js';
 import { FileService } from './main/services/file-service.js';
 // Import utility functions
 import { WindowService } from './main/services/window-service.js';
-// ProcessService is not a class in process-utils, using the functions directly
-import {
-  executeCommand as ProcessService_executeCommand,
-  spawnProcess as ProcessService_spawnProcess,
-  killProcess as ProcessService_killProcess,
-} from './main/lib/process-utils.js';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -40,8 +40,13 @@ app.on('web-contents-created', (event, contents) => {
     try {
       const parsedUrl = new URL(navigationUrl);
 
+      // Get the dev server URL from environment or default
+      const devServerOrigin = new URL(
+        process.env.ELECTRON_DEV_SERVER || 'http://localhost:3000'
+      ).origin;
+
       if (
-        parsedUrl.origin !== 'http://localhost:3000' &&
+        parsedUrl.origin !== devServerOrigin &&
         !parsedUrl.protocol.includes('file:')
       ) {
         event.preventDefault();
@@ -74,7 +79,7 @@ const createMainWindow = () => {
       webSecurity: true,
       allowRunningInsecureContent: false,
       experimentalFeatures: false,
-      preload: path.join(__dirname, '../dist-ts/preload.js'),
+      preload: path.join(__dirname, '../preload.js'),
     },
   });
 
@@ -88,8 +93,33 @@ const createMainWindow = () => {
   WindowService.setupHandlers(mainWindow, isDevelopment, {
     onReady: (window: BrowserWindow) => {
       console.log('Main window ready');
-      // Dev tools disabled for welcome screen - can be opened manually if needed
-      // window.webContents.openDevTools({ mode: 'detach' });
+      // Dev tools disabled by default - use OPEN_DEVTOOLS=1 env var or Ctrl+Shift+I to enable
+      if (
+        process.env.OPEN_DEVTOOLS === 'true' ||
+        process.env.OPEN_DEVTOOLS === '1'
+      ) {
+        window.webContents.openDevTools({ mode: 'detach' });
+      }
+
+      // Keyboard shortcut to toggle devtools (Ctrl+Shift+I or Cmd+Option+I on Mac)
+      window.webContents.on('before-input-event', (event, input) => {
+        if (input.type === 'keyDown') {
+          const isMac = process.platform === 'darwin';
+          const shortcutPressed =
+            input.code === 'KeyI' &&
+            ((input.control && input.shift) ||
+              (isMac && input.meta && input.alt));
+
+          if (shortcutPressed) {
+            if (window.webContents.isDevToolsOpened()) {
+              window.webContents.closeDevTools();
+            } else {
+              window.webContents.openDevTools({ mode: 'detach' });
+            }
+            event.preventDefault();
+          }
+        }
+      });
     },
     onClosed: (window: BrowserWindow) => {
       console.log('Main window closed');
@@ -316,6 +346,45 @@ function registerIpcHandlers() {
     }
   );
 
+  // Set default application menu with devtools
+  const defaultMenu = Menu.buildFromTemplate([
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools', accelerator: 'CommandOrControl+Shift+I' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+      ],
+    },
+    {
+      role: 'windowMenu',
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'About',
+          click: async () => {
+            const { dialog } = await import('electron');
+            dialog.showMessageBox({
+              type: 'info',
+              title: 'About',
+              message: 'Electron + Vue App',
+              detail: 'Built with Rsbuild',
+            });
+          },
+        },
+      ],
+    },
+  ]);
+  Menu.setApplicationMenu(defaultMenu);
+
   // Shell handlers
   ipcMain.handle('shell:openExternal', async (event, url: string) => {
     return shell.openExternal(url);
@@ -362,8 +431,13 @@ app.on('web-contents-created', (event, contents) => {
     try {
       const parsedUrl = new URL(navigationUrl);
 
+      // Get the dev server URL from environment or default
+      const devServerOrigin = new URL(
+        process.env.ELECTRON_DEV_SERVER || 'http://localhost:3000'
+      ).origin;
+
       if (
-        parsedUrl.origin !== 'http://localhost:3000' &&
+        parsedUrl.origin !== devServerOrigin &&
         !parsedUrl.protocol.includes('file:')
       ) {
         event.preventDefault();

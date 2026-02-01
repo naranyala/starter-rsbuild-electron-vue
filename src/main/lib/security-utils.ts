@@ -115,6 +115,7 @@ export function configureSecuritySession(options: {
   enableNodeIntegration?: boolean;
   enableContextIsolation?: boolean;
   enableExperimentalFeatures?: boolean;
+  isDevelopment?: boolean;
 } = {}): void {
   const defaultSession = session.defaultSession;
 
@@ -125,6 +126,7 @@ export function configureSecuritySession(options: {
     enableNodeIntegration = false,
     enableContextIsolation = true,
     enableExperimentalFeatures = false,
+    isDevelopment = false,
   } = options;
 
   // Disable mixed content mode
@@ -133,7 +135,7 @@ export function configureSecuritySession(options: {
       callback({
         responseHeaders: {
           ...details.responseHeaders,
-          'Content-Security-Policy': [getProductionCSP()],
+          'Content-Security-Policy': [isDevelopment ? getDevelopmentCSP() : getProductionCSP()],
           'X-Content-Type-Options': ['nosniff'],
           'X-Frame-Options': ['DENY'],
           'X-XSS-Protection': ['1; mode=block'],
@@ -222,7 +224,7 @@ export function validateUrl(url: string, options: {
     allowLocalhost = true,
     allowFileUrls = false,
     allowedDomains = [],
-    allowedProtocols = ['https:', 'http:', 'wss:', 'ws:'],
+    allowedProtocols = ['https:', 'http:'],
   } = options;
 
   try {

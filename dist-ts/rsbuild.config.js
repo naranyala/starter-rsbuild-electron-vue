@@ -9,6 +9,11 @@ export default defineConfig({
             enable: true,
         }),
     ],
+    source: {
+        entry: {
+            index: './src/renderer/main.js',
+        },
+    },
     html: {
         template: './src/renderer/index.html',
         meta: {
@@ -23,14 +28,19 @@ export default defineConfig({
         copy: [{ from: './src/renderer/assets', to: 'assets/' }],
     },
     server: {
-        port: 3000, // Default port, will be overridden in dev server
-        strictPort: false, // Allow using alternative port if 3000 is occupied
+        port: 3000, // Default port, can be overridden with --port flag
+        strictPort: false, // Allow using alternative port if default is occupied
         printUrls: true,
     },
-    source: {
-        entry: {
-            index: './src/renderer/main.js',
+    dev: {
+        // Configure HMR settings to avoid KIO issues
+        client: {
+            host: 'localhost',
+            protocol: 'ws',
         },
+        hmr: true,
+        liveReload: true,
+        writeToDisk: false,
     },
     performance: {
         chunkSplit: {

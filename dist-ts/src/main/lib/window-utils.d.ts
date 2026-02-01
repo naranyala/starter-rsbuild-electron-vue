@@ -60,9 +60,9 @@ export declare function createDevWindow(options?: WindowOptions): BrowserWindow;
 /**
  * Load URL into window with dev/reload handling
  * @param window - Window instance
- * @param port - Development server port
+ * @param port - Development server port (used if devServerUrl is not provided)
  * @param isDev - Whether in development mode
- * @param devServerUrl - Custom dev server URL
+ * @param devServerUrl - Custom dev server URL (takes precedence over port)
  */
 export declare function loadUrl(window: BrowserWindow, port?: number, isDev?: boolean, devServerUrl?: string | null): void;
 /**

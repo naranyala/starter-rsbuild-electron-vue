@@ -81,14 +81,14 @@ export function getProductionCSP() {
  */
 export function configureSecuritySession(options = {}) {
     const defaultSession = session.defaultSession;
-    const { enableMixedContentMode = false, enableWebSecurity = true, allowRunningInsecureContent = false, enableNodeIntegration = false, enableContextIsolation = true, enableExperimentalFeatures = false, } = options;
+    const { enableMixedContentMode = false, enableWebSecurity = true, allowRunningInsecureContent = false, enableNodeIntegration = false, enableContextIsolation = true, enableExperimentalFeatures = false, isDevelopment = false, } = options;
     // Disable mixed content mode
     if (!enableMixedContentMode) {
         defaultSession.webRequest.onHeadersReceived((details, callback) => {
             callback({
                 responseHeaders: {
                     ...details.responseHeaders,
-                    'Content-Security-Policy': [getProductionCSP()],
+                    'Content-Security-Policy': [isDevelopment ? getDevelopmentCSP() : getProductionCSP()],
                     'X-Content-Type-Options': ['nosniff'],
                     'X-Frame-Options': ['DENY'],
                     'X-XSS-Protection': ['1; mode=block'],
@@ -160,7 +160,7 @@ export function configureSecuritySession(options = {}) {
  * @returns True if URL is secure
  */
 export function validateUrl(url, options = {}) {
-    const { allowLocalhost = true, allowFileUrls = false, allowedDomains = [], allowedProtocols = ['https:', 'http:', 'wss:', 'ws:'], } = options;
+    const { allowLocalhost = true, allowFileUrls = false, allowedDomains = [], allowedProtocols = ['https:', 'http:'], } = options;
     try {
         const parsedUrl = new URL(url);
         // Check protocol

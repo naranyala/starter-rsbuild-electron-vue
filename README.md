@@ -24,20 +24,27 @@ A production-ready Electron + Vue.js starter kit featuring Rsbuild for high-perf
 
 ```
 project-root/
-├── rsbuild.config.js           # Build configuration
-├── scripts/build.mjs           # Build orchestration
+├── rsbuild.config.ts           # Build configuration
+├── scripts/
+│   ├── check-dependencies.mjs  # Dependency checking utilities
+│   ├── build-frontend.mjs      # Frontend build orchestration
+│   ├── build-electron.mjs      # Electron build orchestration
+│   ├── dev-web.mjs             # Web development server
+│   ├── dev-electron.mjs        # Electron development environment
+│   └── start.mjs               # Production startup script
 ├── src/
-│   ├── main.cjs                # Production main process
-│   ├── main-dev.cjs            # Development main process
-│   ├── preload.cjs             # Secure preload script
+│   ├── main.ts                 # Production main process
+│   ├── main-dev.ts             # Development main process
+│   ├── preload.ts              # Secure preload script
 │   └── renderer/
 │       ├── main.js             # Vue application entry
 │       ├── App.vue             # Root component
 │       ├── use-cases/          # Modular window components
 │       ├── components/         # Reusable UI elements
 │       └── styles/             # Global styling
-├── build/                      # Compiled application
-└── dist/                       # Distribution packages
+├── build/                      # Compiled frontend application
+├── dist/                       # Distribution packages
+└── dist-ts/                    # Compiled TypeScript sources
 ```
 
 ## Quick Start
@@ -82,8 +89,14 @@ bun run dist
 | Command | Purpose |
 |---------|---------|
 | `bun run dev` | Development server with Electron |
+| `bun run dev:web` | Web development server only |
+| `bun run dev:electron` | Electron development environment |
 | `bun run build` | Production application build |
+| `bun run build:frontend` | Frontend build only |
+| `bun run build:electron` | Electron application build |
+| `bun run build:ts` | TypeScript compilation |
 | `bun run dist` | Create distributable packages |
+| `bun run start` | Start built application |
 | `bun run lint` | Code quality analysis |
 | `bun run format` | Automatic code formatting |
 
