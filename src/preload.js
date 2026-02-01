@@ -1,16 +1,10 @@
 // Preload Script for Electron Renderer Process
-// This script runs in a Node.js context and bridges to the renderer
+// Polyfill global for Vue and other dependencies
+if (typeof global === 'undefined') {
+  window.global = window;
+}
 
-// Polyfill global for renderer (Vue and other libs need this)
-Object.defineProperty(window, 'global', {
-  value: window,
-  writable: true,
-  configurable: true,
-});
-
-const electron = require('electron');
-const contextBridge = electron.contextBridge;
-const ipcRenderer = electron.ipcRenderer;
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   fs: {

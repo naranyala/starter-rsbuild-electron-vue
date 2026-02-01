@@ -1,1 +1,0 @@
-{"version":3,"file":"window-generator.d.ts","sourceRoot":"","sources":["../../../../src/renderer/lib/window-generator.ts"],"names":[],"mappings":"AAYA,UAAU,KAAK;IACb,IAAI,EAAE,MAAM,CAAC;IACb,EAAE,EAAE,MAAM,CAAC;IACX,KAAK,EAAE,MAAM,CAAC;CACf;AA0FD;;;;GAIG;AACH,wBAAgB,qBAAqB,CAAC,KAAK,EAAE,MAAM,GAAG,MAAM,CA0E3D;AAED;;;;GAIG;AACH,wBAAgB,aAAa,CAAC,KAAK,EAAE,MAAM,GAAG,KAAK,CAuBlD"}

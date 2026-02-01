@@ -6,13 +6,17 @@ export default defineConfig({
   plugins: [
     pluginVue(),
     pluginTypeCheck({
-      // Enable type checking
       enable: true,
     }),
   ],
   source: {
     entry: {
-      index: './src/renderer/main.js',
+      index: './src/renderer/main.ts',
+    },
+    define: {
+      'process.env.NODE_ENV': JSON.stringify(
+        process.env.NODE_ENV || 'development'
+      ),
     },
   },
   html: {
@@ -23,22 +27,17 @@ export default defineConfig({
   },
   output: {
     distPath: {
-      root: './build', // Output to build directory for electron-builder compatibility
+      root: './build',
     },
-    cleanDistPath: true, // Clean build directory before each build
+    cleanDistPath: true,
     copy: [{ from: './src/renderer/assets', to: 'assets/' }],
   },
   server: {
-    port: 3000, // Default port, can be overridden with --port flag
-    strictPort: false, // Allow using alternative port if default is occupied
+    port: 3000,
+    strictPort: false,
     printUrls: true,
   },
   dev: {
-    // Configure HMR settings to avoid KIO issues
-    client: {
-      host: 'localhost',
-      protocol: 'ws',
-    },
     hmr: true,
     liveReload: true,
     writeToDisk: false,
@@ -46,6 +45,15 @@ export default defineConfig({
   performance: {
     chunkSplit: {
       strategy: 'split-by-experience',
+    },
+  },
+  tools: {
+    bundlerChain: chain => {
+      chain.target('electron-renderer');
+    },
+    rspack: rspack => {
+      rspack.output ||= {};
+      rspack.output.globalObject = 'window';
     },
   },
 });
