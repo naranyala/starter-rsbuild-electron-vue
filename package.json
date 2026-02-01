@@ -1,16 +1,19 @@
 {
   "name": "electron-vue-rsbuild-bun",
   "version": "0.1.2",
-  "main": "src/main.cjs",
+  "main": "dist-ts/src/main.js",
   "type": "module",
   "description": "Modern Electron + Vue boilerplate using Rsbuild and Bun runtime.",
   "scripts": {
-    "dev": "node scripts/build.mjs dev",
-    "dev:electron": "node scripts/build.mjs dev:electron",
-    "build": "node scripts/build.mjs build",
-    "build:frontend": "node scripts/build.mjs build:frontend",
-    "dist": "node scripts/build.mjs build --package",
-    "start": "node scripts/build.mjs start",
+    "dev": "node scripts/dev-electron.mjs",
+    "dev:web": "node scripts/dev-web.mjs",
+    "dev:electron": "node scripts/dev-electron.mjs",
+    "build": "node scripts/build-electron.mjs",
+    "build:frontend": "node scripts/build-frontend.mjs",
+    "build:electron": "node scripts/build-electron.mjs",
+    "build:ts": "tsc",
+    "dist": "node scripts/build-electron.mjs --package",
+    "start": "node scripts/start.mjs",
     "lint": "biome check .",
     "lint:fix": "biome check --fix .",
     "format": "biome format --write ."
@@ -46,11 +49,20 @@
       "target": "msi"
     },
     "files": [
-      "src/main.cjs",
-      "src/main-dev.cjs",
-      "src/preload.cjs",
-      "src/lib/**/*",
+      "dist-ts/**/*",
       "build/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist-ts/",
+        "to": "dist-ts/"
+      }
+    ],
+    "extraFiles": [
+      {
+        "from": "dist-ts/",
+        "to": "."
+      }
     ]
   },
   "keywords": [
@@ -76,6 +88,9 @@
     "electron-builder": "^26.4.0",
     "electron-reload": "^1.5.0",
     "entities": "^7.0.1",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "wait-on": "^9.0.3"
   }

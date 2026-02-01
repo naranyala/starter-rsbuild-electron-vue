@@ -43,7 +43,7 @@ function buildFrontend() {
     execSync('rm -rf build/', { stdio: 'inherit' });
   }
 
-  execSync(`${rsbuildPath} build --config rsbuild.config.js`, {
+  execSync(`${rsbuildPath} build --config rsbuild.config.ts`, {
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'production' },
   });
@@ -54,6 +54,10 @@ function buildFrontend() {
 // Build full Electron app
 function buildElectron(shouldPackage = false) {
   console.log('🚀 Building Electron app...');
+
+  // Compile TypeScript first
+  console.log('🔧 Compiling TypeScript...');
+  execSync('npm run build:ts', { stdio: 'inherit' });
 
   // Build frontend first
   buildFrontend();
@@ -120,7 +124,7 @@ function startDevWeb() {
     process.exit(1);
   }
 
-  execSync(`${rsbuildPath} dev --config rsbuild.config.js`, {
+  execSync(`${rsbuildPath} dev --config rsbuild.config.ts`, {
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'development' },
   });
@@ -141,7 +145,7 @@ function startDevElectron() {
   // Start Rsbuild dev server
   const devServer = spawn(
     rsbuildPath,
-    ['dev', '--config', 'rsbuild.config.js'],
+    ['dev', '--config', 'rsbuild.config.ts'],
     {
       stdio: 'inherit',
       env: { ...process.env, NODE_ENV: 'development' },
@@ -160,14 +164,30 @@ function startDevElectron() {
 
     console.log('📱 Launching Electron app pointing to development server...');
 
-    const electronProcess = spawn(electronPath, ['src/main-dev.cjs'], {
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        NODE_ENV: 'development',
-        ELECTRON_DEV_SERVER: 'http://localhost:3000',
-      },
-    });
+    // Compile main process files to ES modules first
+    execSync('npx tsc -p tsconfig.json', { stdio: 'inherit' });
+
+    // Fix import paths by adding .js extensions
+    execSync('node scripts/fix-imports.js', { stdio: 'inherit' });
+
+    // Create a simple package.json in dist-ts to mark it as ES module
+    const distTsPackageJson = path.join(process.cwd(), 'dist-ts', 'package.json');
+    if (!fs.existsSync(distTsPackageJson)) {
+      fs.writeFileSync(distTsPackageJson, JSON.stringify({ type: 'module' }, null, 2));
+    }
+
+    const electronProcess = spawn(
+      electronPath,
+      ['dist-ts/src/main-dev.js'],
+      {
+        stdio: 'inherit',
+        env: {
+          ...process.env,
+          NODE_ENV: 'development',
+          ELECTRON_DEV_SERVER: 'http://localhost:3000',
+        },
+      }
+    );
 
     electronProcess.on('close', code => {
       console.log(`Electron process exited with code ${code}`);
@@ -192,6 +212,10 @@ function startDevElectron() {
 function startElectronApp() {
   console.log('🎮 Starting Electron app...');
 
+  // Compile TypeScript first
+  console.log('🔧 Compiling TypeScript...');
+  execSync('npm run build:ts', { stdio: 'inherit' });
+
   // Check if build directory exists (created by 'bun run build')
   if (!fs.existsSync('./build')) {
     console.error('❌ Build directory does not exist. Please run build first.');
@@ -214,7 +238,7 @@ function startElectronApp() {
     process.exit(1);
   }
 
-  const electronProcess = spawn(electronPath, ['src/main.cjs'], {
+  const electronProcess = spawn(electronPath, ['dist-ts/src/main.js'], {
     stdio: 'inherit',
     env: process.env,
   });
@@ -235,10 +259,11 @@ const command = args[0];
 const extraArgs = args.slice(1);
 
 switch (command) {
-  case 'build':
+  case 'build': {
     const shouldPackage = extraArgs.includes('--package');
     buildElectron(shouldPackage);
     break;
+  }
 
   case 'build:frontend':
     buildFrontend();

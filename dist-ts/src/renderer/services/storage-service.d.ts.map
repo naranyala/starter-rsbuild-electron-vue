@@ -1,0 +1,1 @@
+{"version":3,"file":"storage-service.d.ts","sourceRoot":"","sources":["../../../../src/renderer/services/storage-service.ts"],"names":[],"mappings":"AAGA,qBAAa,cAAc;IACzB,MAAM,CAAC,GAAG,sDAAoC;IAC9C,MAAM,CAAC,GAAG,sDAAoC;IAC9C,MAAM,CAAC,MAAM,yDAAuC;IACpD,MAAM,CAAC,KAAK,wDAAsC;IAClD,MAAM,CAAC,GAAG,sDAAoC;IAC9C,MAAM,CAAC,IAAI,uDAAqC;CACjD"}

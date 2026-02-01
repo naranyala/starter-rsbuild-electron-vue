@@ -24,8 +24,8 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node", "vue"]
+    "outDir": "./dist-ts"
   },
-  "include": ["src/**/*", "src/types/**/*"],
-  "exclude": ["node_modules", "build", "dist"]
+  "include": ["src/**/*", "rsbuild.config.ts", "src/shims-vue.d.ts"],
+  "exclude": ["node_modules", "build", "dist", "dist-ts"]
 }
