@@ -19,6 +19,18 @@
         </button>
       </div>
 
+      <!-- Content Tab Filter Switcher -->
+      <div class="tab-filter">
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          :class="['tab-button', { active: activeTab === tab.key }]"
+          @click="setActiveTab(tab.key)"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+
       <div class="cards-list">
         <div
           v-for="(card, index) in filteredCards"
@@ -27,7 +39,7 @@
           @click="handleCardClick(card, index)"
         >
           <div class="card-content">
-            <h3 class="card-title" v-html="processTitle(card.title, searchTerm)"/>
+            <h3 class="card-title">{{ processTitle(card.title, searchTerm) }}</h3>
             <div class="card-meta">
               <span class="card-category">{{ card.category }}</span>
             </div>
@@ -61,51 +73,87 @@ export default {
   data() {
     return {
       searchTerm: '',
+      activeTab: 'all', // Default to show all cards
+      tabs: [
+        { key: 'all', label: 'All Integrations' },
+        { key: 'ui', label: 'UI Components' },
+        { key: 'system', label: 'System APIs' },
+        { key: 'devtools', label: 'Dev Tools' },
+        { key: 'perf', label: 'Performance' },
+        { key: 'security', label: 'Security' },
+      ]
     };
   },
   computed: {
     filteredCards() {
-      return menuData.filter(card => {
+      let filtered = menuData.filter(card => {
         const titleMatch = this.fuzzySearch(
           card.title,
           this.searchTerm
         ).matches;
         return titleMatch;
       });
+
+      // Apply tab filter if not 'all'
+      if (this.activeTab !== 'all') {
+        filtered = filtered.filter(card => {
+          // Map tab keys to categories or tags
+          switch(this.activeTab) {
+            case 'ui':
+              return card.tags.includes('ui') ||
+                     card.tags.includes('components') ||
+                     card.tags.includes('rendering') ||
+                     card.category.includes('ui') ||
+                     card.title.toLowerCase().includes('ui') ||
+                     card.title.toLowerCase().includes('component');
+            case 'system':
+              return card.tags.includes('system') ||
+                     card.tags.includes('native') ||
+                     card.tags.includes('os') ||
+                     card.tags.includes('filesystem') ||
+                     card.category.includes('api') ||
+                     card.category.includes('system');
+            case 'devtools':
+              return card.tags.includes('devtools') ||
+                     card.tags.includes('debugging') ||
+                     card.tags.includes('development') ||
+                     card.tags.includes('testing') ||
+                     card.category.includes('development');
+            case 'perf':
+              return card.tags.includes('performance') ||
+                     card.tags.includes('optimization') ||
+                     card.tags.includes('memory') ||
+                     card.category.includes('performance');
+            case 'security':
+              return card.tags.includes('security') ||
+                     card.tags.includes('csp') ||
+                     card.tags.includes('authentication') ||
+                     card.category.includes('security');
+            default:
+              return true;
+          }
+        });
+      }
+
+      return filtered;
     },
   },
   methods: {
     fuzzySearch(text, query) {
       if (!query) return { matches: true, highlightedText: text };
 
+      const lowerText = text.toLowerCase();
       const lowerQuery = query.toLowerCase();
-      let matchFound = true;
-      let highlightedText = '';
-      let queryIndex = 0;
 
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const lowerChar = char.toLowerCase();
+      // Simple substring match instead of character-by-character matching
+      const matches = lowerText.includes(lowerQuery);
 
-        if (
-          queryIndex < lowerQuery.length &&
-          lowerChar === lowerQuery[queryIndex]
-        ) {
-          highlightedText += `<mark>${char}</mark>`;
-          queryIndex++;
-        } else {
-          highlightedText += char;
-        }
-      }
-
-      matchFound = queryIndex === lowerQuery.length;
-
-      return { matches: matchFound, highlightedText };
+      return { matches: matches, highlightedText: text };
     },
 
     processTitle(title, searchTerm) {
-      const processedTitle = this.fuzzySearch(title, searchTerm);
-      return processedTitle.matches ? processedTitle.highlightedText : title;
+      // Just return the original title since we're no longer highlighting
+      return title;
     },
 
     handleCardClick(card, index) {
@@ -146,6 +194,10 @@ export default {
 
     clearSearch() {
       this.searchTerm = '';
+    },
+
+    setActiveTab(tabKey) {
+      this.activeTab = tabKey;
     },
   },
 };

@@ -2,19 +2,19 @@
  * Theme generation utilities for window components
  */
 export function generateTheme(title: string): { bg: string; color: string } {
-  // Generate a theme based on the title
+  // Generate a theme based on the title with dark theme colors
   const themes: Record<string, { bg: string; color: string }> = {
-    'What is Electron?': { bg: '#4a90e2', color: '#ffffff' },
-    'Electron Architecture': { bg: '#50c878', color: '#ffffff' },
-    'Electron Security': { bg: '#ff6b6b', color: '#ffffff' },
-    'Electron Packaging': { bg: '#ffa500', color: '#ffffff' },
-    'Electron Native APIs': { bg: '#9c27b0', color: '#ffffff' },
-    'Electron Performance': { bg: '#2196f3', color: '#ffffff' },
-    'Electron Development': { bg: '#4caf50', color: '#ffffff' },
-    'Electron Versions': { bg: '#ff9800', color: '#ffffff' },
+    'What is Electron?': { bg: '#1e3a8a', color: '#cbd5e1' }, // Dark blue
+    'Electron Architecture': { bg: '#166534', color: '#bbf7d0' }, // Dark green
+    'Electron Security': { bg: '#7f1d1d', color: '#fecaca' }, // Dark red
+    'Electron Packaging': { bg: '#92400e', color: '#fed7aa' }, // Dark orange
+    'Electron Native APIs': { bg: '#581c87', color: '#ddd6fe' }, // Dark purple
+    'Electron Performance': { bg: '#1e40af', color: '#bfdbfe' }, // Dark blue
+    'Electron Development': { bg: '#166534', color: '#bbf7d0' }, // Dark green
+    'Electron Versions': { bg: '#92400e', color: '#fed7aa' }, // Dark orange
   };
 
-  return themes[title] || { bg: '#607d8b', color: '#ffffff' };
+  return themes[title] || { bg: '#374151', color: '#e5e7eb' }; // Default dark gray
 }
 
 /**

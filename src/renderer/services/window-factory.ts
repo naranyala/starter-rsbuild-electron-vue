@@ -41,7 +41,7 @@ export class WindowFactory {
       height: '400px',
       x: 'center',
       y: 'center',
-      class: 'modern',
+      class: ['modern', 'dark-theme'],
       background: windowTheme.bg,
       border: 4,
       ...options,

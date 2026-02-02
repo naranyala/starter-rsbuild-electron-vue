@@ -1,57 +1,48 @@
-#!/usr/bin/env node
+/**
+ * Start script - runs the built Electron app
+ */
 
-import fs from 'fs';
-import { spawn, execSync } from 'child_process';
-import { checkNodeModules, getElectronPath } from './check-dependencies.mjs';
+import { BuildError } from './error-handler.mjs';
+import { logger } from './logger.mjs';
+import { exec, fsUtils } from './utils.mjs';
 
-// Start built Electron app
-function startElectronApp() {
-  console.log('🎮 Starting Electron app...');
+const ELECTRON = './node_modules/.bin/electron';
 
-  // Compile TypeScript first
-  console.log('🔧 Compiling TypeScript...');
-  execSync('npm run build:ts', { stdio: 'inherit' });
+export async function startApp() {
+  try {
+    logger.info('Starting Electron app...');
 
-  // Check if build directory exists (created by 'bun run build')
-  if (!fs.existsSync('./build')) {
-    console.error('❌ Build directory does not exist. Please run build first.');
-    console.log('💡 Run: bun run build');
-    process.exit(1);
+    logger.info('Compiling TypeScript...');
+    const tsc = exec.sync('npm run build:ts', { stdio: 'inherit' });
+    if (!tsc.success)
+      throw new BuildError('TypeScript compilation failed', 'TSC_FAILED');
+
+    const required = ['./build', './build/index.html'];
+    for (const p of required) {
+      if (!fsUtils.exists(p))
+        throw new BuildError(`Required file not found: ${p}`, 'MISSING_FILE');
+    }
+
+    if (!fsUtils.exists(ELECTRON))
+      throw new BuildError('Electron not found', 'MISSING_ELECTRON');
+
+    logger.info('Launching Electron...');
+
+    const { spawn } = await import('child_process');
+    const electron = spawn(ELECTRON, ['dist-ts/src/main.js'], {
+      stdio: 'inherit',
+      env: process.env,
+    });
+
+    electron.on('close', c => process.exit(c));
+    electron.on('error', e => {
+      logger.error(`Electron error: ${e.message}`);
+      process.exit(1);
+    });
+
+    return { success: true };
+  } catch (e) {
+    logger.error(`Start failed: ${e.message}`);
+    return { success: false, error: e.message };
   }
-
-  // Check if index.html exists in build directory
-  if (!fs.existsSync('./build/index.html')) {
-    console.error('❌ Built app not found in build directory.');
-    console.log('💡 Run: bun run build');
-    process.exit(1);
-  }
-
-  checkNodeModules();
-
-  const electronPath = getElectronPath();
-  if (!fs.existsSync(electronPath)) {
-    console.error('❌ Electron not found. Please install dependencies first.');
-    process.exit(1);
-  }
-
-  const electronProcess = spawn(electronPath, ['dist-ts/src/main.js'], {
-    stdio: 'inherit',
-    env: process.env,
-  });
-
-  electronProcess.on('close', code => {
-    console.log(`Electron process exited with code ${code}`);
-    process.exit(code);
-  });
-
-  electronProcess.on('error', err => {
-    console.error('Electron process error:', err.message);
-  });
 }
-
-// Run if this script is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  startElectronApp();
-}
-
-export { startElectronApp };
