@@ -205,8 +205,15 @@ export async function startDevElectron(options = {}) {
 
     // Launch Electron
     logger.info('Launching Electron...');
+    const electronArgs = [];
+    if (config.get('env.ELECTRON_DISABLE_SANDBOX') === '1') {
+      electronArgs.push('--no-sandbox');
+      electronArgs.push('--disable-setuid-sandbox');
+      electronArgs.push('--disable-gpu-sandbox');
+    }
+    electronArgs.push(config.get('electron.devEntry'));
 
-    const electronProcess = spawn(ELECTRON, [config.get('electron.devEntry')], {
+    const electronProcess = spawn(ELECTRON, electronArgs, {
       env: config.getElectronEnv({
         NODE_ENV: 'development',
         ELECTRON_DEV_SERVER: url,

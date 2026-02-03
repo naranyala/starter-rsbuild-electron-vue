@@ -1,5 +1,9 @@
 <template>
   <div class="App">
+    <Sidebar
+      @go-home="goHome"
+    />
+
     <main class="App-main">
       <div class="search-section">
         <input
@@ -67,9 +71,13 @@ import {
   ElectronSecurityWindow,
   ElectronVersionsWindow,
 } from '../services';
+import Sidebar from './Sidebar.vue';
 
 export default {
   name: 'App',
+  components: {
+    Sidebar
+  },
   data() {
     return {
       searchTerm: '',
@@ -156,39 +164,45 @@ export default {
       return title;
     },
 
-    handleCardClick(card, index) {
+    async handleCardClick(card, index) {
       const { id, title } = card;
+
+      let winboxInstance;
 
       switch (id) {
         case 'electron-intro':
-          ElectronIntroWindow.create();
+          winboxInstance = ElectronIntroWindow.create();
           break;
         case 'electron-architecture':
-          ElectronArchitectureWindow.create();
+          winboxInstance = ElectronArchitectureWindow.create();
           break;
         case 'electron-security':
-          ElectronSecurityWindow.create();
+          winboxInstance = ElectronSecurityWindow.create();
           break;
         case 'electron-packaging':
-          ElectronPackagingWindow.create();
+          winboxInstance = ElectronPackagingWindow.create();
           break;
         case 'electron-native-apis':
-          ElectronNativeAPIsWindow.create();
+          winboxInstance = ElectronNativeAPIsWindow.create();
           break;
         case 'electron-performance':
-          ElectronPerformanceWindow.create();
+          winboxInstance = ElectronPerformanceWindow.create();
           break;
         case 'electron-development':
-          ElectronDevelopmentWindow.create();
+          winboxInstance = ElectronDevelopmentWindow.create();
           break;
         case 'electron-versions':
-          ElectronVersionsWindow.create();
+          winboxInstance = ElectronVersionsWindow.create();
           break;
         default:
-          import('../services/window-factory').then(({ WindowFactory }) => {
-            WindowFactory.createWindow(title);
-          });
+          const { WindowFactory } = await import('../services/window-factory');
+          winboxInstance = WindowFactory.createWindow(title);
           break;
+      }
+
+      // Register the window with the window manager if it was created successfully
+      if (winboxInstance) {
+        // Registration handled by WindowFactory
       }
     },
 
@@ -199,9 +213,43 @@ export default {
     setActiveTab(tabKey) {
       this.activeTab = tabKey;
     },
+
+    goHome() {
+      try {
+        // Minimize all active WinBox windows when returning home
+        import('../stores/windowStore').then(({ useWindowStore }) => {
+          const windowStore = useWindowStore();
+          windowStore.minimizeAllWindows();
+        });
+      } catch (error) {
+        // Non-blocking: UI should still reset
+      }
+      this.searchTerm = '';
+      this.activeTab = 'all';
+    }
   },
 };
 </script>
 
 <style scoped>
+.App {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 100vh;
+}
+
+.App-main {
+  flex: 1;
+  padding: 16px;
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 767px) {
+  .App-main {
+    width: 100%;
+  }
+  .App {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

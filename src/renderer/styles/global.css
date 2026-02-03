@@ -1,19 +1,16 @@
-/* Centered layout styles */
+/* Layout styles */
 html,
 body {
   height: 100%;
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  overflow: hidden; /* Prevent double scrollbars when sidebar is present */
 }
 
 #root {
   width: 100%;
-  max-width: 1200px;
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }

@@ -29,6 +29,12 @@ import { WindowService } from './main/services/window-service.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Disable Chromium sandbox when running in restricted environments (e.g. containers).
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('no-sandbox');
+  app.commandLine.appendSwitch('disable-setuid-sandbox');
+}
+
 // Security settings
 app.on('web-contents-created', (event, contents) => {
   contents.setWindowOpenHandler(details => {

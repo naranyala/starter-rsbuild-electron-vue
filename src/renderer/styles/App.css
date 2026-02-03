@@ -335,6 +335,10 @@ body {
 }
 
 /* WinBox dark theme override */
+.winbox {
+  z-index: 2001;
+}
+
 .wb-body {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
@@ -364,6 +368,18 @@ body {
 .wb-full .wb-body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+}
+
+/* Keep fullscreen WinBox visible alongside the sidebar */
+@media (min-width: 900px) {
+  .winbox.wb-full {
+    left: 300px;
+    width: calc(100% - 300px);
+  }
+  .winbox.max {
+    left: 300px;
+    width: calc(100% - 300px);
+  }
 }
 
 /* Ensure WinBox modals cover everything */
