@@ -171,14 +171,21 @@ function startDevElectron() {
     execSync('node scripts/fix-imports.js', { stdio: 'inherit' });
 
     // Create a simple package.json in dist-ts to mark it as ES module
-    const distTsPackageJson = path.join(process.cwd(), 'dist-ts', 'package.json');
+    const distTsPackageJson = path.join(
+      process.cwd(),
+      'dist-ts',
+      'package.json'
+    );
     if (!fs.existsSync(distTsPackageJson)) {
-      fs.writeFileSync(distTsPackageJson, JSON.stringify({ type: 'module' }, null, 2));
+      fs.writeFileSync(
+        distTsPackageJson,
+        JSON.stringify({ type: 'module' }, null, 2)
+      );
     }
 
     const electronProcess = spawn(
       electronPath,
-      ['dist-ts/src/main-dev.js'],
+      ['dist-ts/src/backend/backend-dev.js'],
       {
         stdio: 'inherit',
         env: {
@@ -238,10 +245,14 @@ function startElectronApp() {
     process.exit(1);
   }
 
-  const electronProcess = spawn(electronPath, ['dist-ts/src/main.js'], {
-    stdio: 'inherit',
-    env: process.env,
-  });
+  const electronProcess = spawn(
+    electronPath,
+    ['dist-ts/src/backend/backend.js'],
+    {
+      stdio: 'inherit',
+      env: process.env,
+    }
+  );
 
   electronProcess.on('close', code => {
     console.log(`Electron process exited with code ${code}`);

@@ -29,7 +29,7 @@ export async function startApp() {
     logger.info('Launching Electron...');
 
     const { spawn } = await import('child_process');
-    const electron = spawn(ELECTRON, ['dist-ts/src/main.js'], {
+    const electron = spawn(ELECTRON, ['dist-ts/src/backend/backend.js'], {
       stdio: 'inherit',
       env: process.env,
     });

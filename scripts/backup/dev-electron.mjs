@@ -143,7 +143,7 @@ async function startDevElectron() {
 
         const electronProcess = spawn(
           electronPath,
-          ['dist-ts/src/main-dev.js'],
+          ['dist-ts/src/backend/backend-dev.js'],
           {
             stdio: 'inherit',
             env: {

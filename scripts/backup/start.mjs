@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
+import { execSync, spawn } from 'child_process';
 import fs from 'fs';
-import { spawn, execSync } from 'child_process';
 import { checkNodeModules, getElectronPath } from './check-dependencies.mjs';
 
 // Start built Electron app
@@ -34,10 +34,14 @@ function startElectronApp() {
     process.exit(1);
   }
 
-  const electronProcess = spawn(electronPath, ['dist-ts/src/main.js'], {
-    stdio: 'inherit',
-    env: process.env,
-  });
+  const electronProcess = spawn(
+    electronPath,
+    ['dist-ts/src/backend/backend.js'],
+    {
+      stdio: 'inherit',
+      env: process.env,
+    }
+  );
 
   electronProcess.on('close', code => {
     console.log(`Electron process exited with code ${code}`);

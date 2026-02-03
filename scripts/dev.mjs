@@ -99,7 +99,7 @@ export async function startDevElectron() {
 
       logger.info(`Launching Electron...`);
 
-      const electron = spawn(ELECTRON, ['dist-ts/src/main-dev.js'], {
+      const electron = spawn(ELECTRON, ['dist-ts/src/backend/backend-dev.js'], {
         env: {
           ...process.env,
           ...KDE_ENV,

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-03T17:23:02.069Z",
+  "duration": 196,
+  "totalTests": 1,
+  "passedTests": 1,
+  "failedTests": 0,
+  "results": [
+    {
+      "file": "src/__tests__/security.test.ts",
+      "status": "PASS",
+      "stdout": "bun test v1.3.8 (b64edcb4)\n",
+      "stderr": "\nsrc/__tests__/security.test.ts:\n(pass) Security Tests > Input Validation > should validate user inputs against XSS attacks [2.00ms]\n(pass) Security Tests > Input Validation > should validate file paths to prevent directory traversal\n(pass) Security Tests > Input Validation > should validate URLs to prevent SSRF attacks [2.00ms]\n(pass) Security Tests > CSP and Security Headers > should have proper Content Security Policy headers\n(pass) Security Tests > CSP and Security Headers > should have security headers enabled\n(pass) Security Tests > File System Security > should prevent unauthorized file access [1.00ms]\n(pass) Security Tests > File System Security > should validate file uploads\n(pass) Security Tests > Authentication and Authorization > should enforce strong password policies\n(pass) Security Tests > Authentication and Authorization > should prevent session fixation [1.00ms]\n(pass) Security Tests > Injection Prevention > should prevent SQL injection\n(pass) Security Tests > Injection Prevention > should prevent command injection [1.00ms]\n(pass) Security Tests > Cryptography and Secrets > should use secure hashing algorithms [3.00ms]\n(pass) Security Tests > Cryptography and Secrets > should not expose secrets in code [3.00ms]\n(pass) Security Tests > Electron Security > should have nodeIntegration disabled in production [1.00ms]\n(pass) Security Tests > Electron Security > should validate IPC channels\n\n 15 pass\n 0 fail\n 339 expect() calls\nRan 15 tests across 1 file. [153.00ms]\n",
+      "duration": 0
+    }
+  ],
+  "summary": {
+    "passRate": "100.00%"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-02-03T17:24:18.323Z",
+  "project": "starter-rsbuild-electron-vue",
+  "results": {},
+  "errors": [
+    "Potential secret found in /run/media/naranyala/Data/projects-remote/starter-rsbuild-electron-vue/src/frontend/components/App.vue: key=\"tab.key\"",
+    "Potential secret found in /run/media/naranyala/Data/projects-remote/starter-rsbuild-electron-vue/src/frontend/components/Sidebar.vue: key=\"window.id\"",
+    "Potentially vulnerable code pattern found in /run/media/naranyala/Data/projects-remote/starter-rsbuild-electron-vue/src/frontend/lib/dom.ts",
+    "Potentially vulnerable code pattern found in /run/media/naranyala/Data/projects-remote/starter-rsbuild-electron-vue/src/frontend/services/window-factory.ts",
+    "Potentially vulnerable code pattern found in /run/media/naranyala/Data/projects-remote/starter-rsbuild-electron-vue/src/frontend/windows/index.ts"
+  ],
+  "warnings": [
+    "Bun audit detected issues",
+    "Could not parse ESLint output"
+  ],
+  "summary": {
+    "totalErrors": 5,
+    "totalWarnings": 2,
+    "status": "FAIL"
+  }
+}

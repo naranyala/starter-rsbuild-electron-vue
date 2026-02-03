@@ -27,5 +27,5 @@
     "outDir": "./dist-ts"
   },
   "include": ["src/**/*", "rsbuild.config.ts", "src/shims-vue.d.ts"],
-  "exclude": ["node_modules", "build", "dist", "dist-ts"]
+  "exclude": ["node_modules", "build", "dist", "dist-ts", "src/__tests__"]
 }
