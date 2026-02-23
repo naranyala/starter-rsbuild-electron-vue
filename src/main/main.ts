@@ -4,10 +4,11 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { getMainContainer, initializeMainContainer } from './di';
 import {
-  WINDOW_SERVICE_TOKEN,
   APP_SERVICE_TOKEN,
   registerAllHandlers,
+  WINDOW_SERVICE_TOKEN,
 } from './use-cases';
+import { WindowService } from './use-cases/window.service';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -30,8 +31,8 @@ const container = initializeMainContainer(app);
 let mainWindow: BrowserWindow | null;
 
 function createMainWindow() {
-  // Get services from DI container
-  const windowService = container.get(WINDOW_SERVICE_TOKEN);
+  // Create window service instance
+  const windowService = new WindowService();
 
   // Create the browser window with secure defaults
   mainWindow = windowService.create({

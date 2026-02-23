@@ -15,7 +15,7 @@ const CONFIG = {
   TEST_DIR: './src/__tests__',
   SECURITY_TEST_PATTERN: 'security.test.ts',
   REPORT_DIR: './reports',
-  TIMEOUT: 300000 // 5 minutes
+  TIMEOUT: 300000, // 5 minutes
 };
 
 class SecurityTestRunner {
@@ -53,8 +53,9 @@ class SecurityTestRunner {
       this.analyzeResults();
 
       const duration = Date.now() - this.startTime;
-      console.log(`\n⏱️  Total execution time: ${(duration / 1000).toFixed(2)} seconds`);
-
+      console.log(
+        `\n⏱️  Total execution time: ${(duration / 1000).toFixed(2)} seconds`
+      );
     } catch (error) {
       console.error('💥 Security test runner failed:', error);
       process.exit(1);
@@ -64,7 +65,7 @@ class SecurityTestRunner {
   private checkBunAvailability(): void {
     try {
       const bunVersion = spawnSync('bun', ['--version'], {
-        encoding: 'utf8'
+        encoding: 'utf8',
       });
 
       if (bunVersion.status !== 0) {
@@ -101,11 +102,11 @@ class SecurityTestRunner {
 
     for (const testFile of testFiles) {
       console.log(`🚀 Running: ${testFile}`);
-      
+
       const result = spawnSync('bun', ['test', testFile], {
         cwd: CONFIG.PROJECT_ROOT,
         encoding: 'utf8',
-        timeout: CONFIG.TIMEOUT
+        timeout: CONFIG.TIMEOUT,
       });
 
       if (result.status === 0) {
@@ -120,7 +121,7 @@ class SecurityTestRunner {
         status: result.status === 0 ? 'PASS' : 'FAIL',
         stdout: result.stdout,
         stderr: result.stderr,
-        duration: result.duration || 0
+        duration: result.duration || 0,
       });
     }
   }
@@ -136,18 +137,29 @@ class SecurityTestRunner {
       failedTests: this.results.filter(r => r.status === 'FAIL').length,
       results: this.results,
       summary: {
-        passRate: this.results.length > 0 ? 
-          (this.results.filter(r => r.status === 'PASS').length / this.results.length * 100).toFixed(2) + '%' : 
-          '0%'
-      }
+        passRate:
+          this.results.length > 0
+            ? (
+                (this.results.filter(r => r.status === 'PASS').length /
+                  this.results.length) *
+                100
+              ).toFixed(2) + '%'
+            : '0%',
+      },
     };
 
-    const reportPath = path.join(CONFIG.REPORT_DIR, 'security-test-report.json');
+    const reportPath = path.join(
+      CONFIG.REPORT_DIR,
+      'security-test-report.json'
+    );
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
 
     // Also generate a human-readable report
     const readableReport = this.generateReadableReport(report);
-    const readableReportPath = path.join(CONFIG.REPORT_DIR, 'security-test-report.txt');
+    const readableReportPath = path.join(
+      CONFIG.REPORT_DIR,
+      'security-test-report.txt'
+    );
     fs.writeFileSync(readableReportPath, readableReport);
 
     console.log(`✅ Report generated: ${reportPath}`);
@@ -166,7 +178,7 @@ class SecurityTestRunner {
 
     output += 'Test Results:\n';
     output += '-'.repeat(30) + '\n';
-    
+
     for (const result of report.results) {
       output += `\nFile: ${result.file}\n`;
       output += `Status: ${result.status}\n`;
@@ -181,13 +193,13 @@ class SecurityTestRunner {
 
   private analyzeResults(): void {
     const failedTests = this.results.filter(r => r.status === 'FAIL');
-    
+
     if (failedTests.length > 0) {
       console.log('🚨 Security tests failed! Critical issues detected:');
       failedTests.forEach(test => {
         console.log(`  - ${test.file}`);
       });
-      
+
       // Exit with error code if any security tests failed
       process.exit(1);
     } else {

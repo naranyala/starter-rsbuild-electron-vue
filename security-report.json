@@ -9,10 +9,7 @@
     "Potentially vulnerable code pattern found in /run/media/naranyala/Data/projects-remote/starter-rsbuild-electron-vue/src/frontend/services/window-factory.ts",
     "Potentially vulnerable code pattern found in /run/media/naranyala/Data/projects-remote/starter-rsbuild-electron-vue/src/frontend/windows/index.ts"
   ],
-  "warnings": [
-    "Bun audit detected issues",
-    "Could not parse ESLint output"
-  ],
+  "warnings": ["Bun audit detected issues", "Could not parse ESLint output"],
   "summary": {
     "totalErrors": 5,
     "totalWarnings": 2,

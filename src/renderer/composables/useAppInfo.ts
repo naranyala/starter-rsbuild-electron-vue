@@ -3,8 +3,8 @@
  */
 
 import { computed } from 'vue';
-import { useInject } from './useInject';
 import { APP_INFO_TOKEN, type AppInfo } from '../di';
+import { useInject } from './useInject';
 
 /**
  * Composable for accessing app information

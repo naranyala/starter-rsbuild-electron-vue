@@ -83,7 +83,11 @@ export interface UIEvents {
   'ui:sidebar:toggle': { visible: boolean };
   'ui:modal:open': { modalId: string };
   'ui:modal:close': { modalId: string };
-  'ui:notification:show': { title: string; message: string; type: 'info' | 'success' | 'warning' | 'error' };
+  'ui:notification:show': {
+    title: string;
+    message: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+  };
 }
 
 /**
@@ -98,15 +102,14 @@ export interface ErrorEvents {
 /**
  * Combined Event Map
  */
-export type EventMap = 
-  & AppEvents 
-  & WindowEvents 
-  & FileEvents 
-  & UserEvents 
-  & NavigationEvents 
-  & DataEvents 
-  & UIEvents 
-  & ErrorEvents;
+export type EventMap = AppEvents &
+  WindowEvents &
+  FileEvents &
+  UserEvents &
+  NavigationEvents &
+  DataEvents &
+  UIEvents &
+  ErrorEvents;
 
 /**
  * All possible event names
@@ -136,4 +139,5 @@ export const EVENT_CATEGORIES = {
 /**
  * Type for event categories
  */
-export type EventCategory = typeof EVENT_CATEGORIES[keyof typeof EVENT_CATEGORIES];
+export type EventCategory =
+  (typeof EVENT_CATEGORIES)[keyof typeof EVENT_CATEGORIES];

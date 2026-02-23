@@ -2,8 +2,8 @@
  * Composable for IPC operations
  */
 
-import { useInject } from './useInject';
 import { IPC_SERVICE_TOKEN } from '../di';
+import { useInject } from './useInject';
 
 /**
  * Composable for IPC communication
@@ -28,14 +28,20 @@ export function useIPC() {
   /**
    * Listen for events
    */
-  const on = (channel: string, callback: (...args: unknown[]) => void): (() => void) => {
+  const on = (
+    channel: string,
+    callback: (...args: unknown[]) => void
+  ): (() => void) => {
     return ipc.on(channel, callback);
   };
 
   /**
    * Listen for a one-time event
    */
-  const once = (channel: string, callback: (...args: unknown[]) => void): (() => void) => {
+  const once = (
+    channel: string,
+    callback: (...args: unknown[]) => void
+  ): (() => void) => {
     return ipc.once(channel, callback);
   };
 

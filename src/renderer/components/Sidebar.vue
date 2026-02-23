@@ -64,8 +64,8 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { storeToRefs } from 'pinia';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useWindowStore } from '../stores/windowStore';
 import { windowManager } from '../windows';
 
@@ -95,17 +95,26 @@ export default {
       emit('go-home');
     };
 
-    const focusWindow = (window) => {
+    const focusWindow = window => {
       if (window.instance) {
         // Use the enhanced window manager to handle focus properly with maximized windows
-        if (windowManager.focusSpecificWindow && typeof windowManager.focusSpecificWindow === 'function') {
+        if (
+          windowManager.focusSpecificWindow &&
+          typeof windowManager.focusSpecificWindow === 'function'
+        ) {
           windowManager.focusSpecificWindow(window.instance);
         } else {
           // Fallback to basic functionality
-          if ((window.minimized || window.instance.hidden) && typeof window.instance.show === 'function') {
+          if (
+            (window.minimized || window.instance.hidden) &&
+            typeof window.instance.show === 'function'
+          ) {
             window.instance.show();
           }
-          if (window.instance.min && typeof window.instance.restore === 'function') {
+          if (
+            window.instance.min &&
+            typeof window.instance.restore === 'function'
+          ) {
             window.instance.restore();
           }
           if (typeof window.instance.focus === 'function') {
@@ -115,13 +124,13 @@ export default {
       }
     };
 
-    const closeWindow = (window) => {
+    const closeWindow = window => {
       if (window.instance && typeof window.instance.close === 'function') {
         window.instance.close();
       }
     };
 
-    const getWindowStatus = (window) => {
+    const getWindowStatus = window => {
       if (window.minimized || window.hidden) return 'Minimized';
       if (window.maximized) return 'Maximized';
       if (window.focused) return 'Active';
@@ -131,7 +140,6 @@ export default {
     onMounted(() => {
       checkScreenSize();
       window.addEventListener('resize', checkScreenSize);
-
     });
 
     onBeforeUnmount(() => {
@@ -147,9 +155,9 @@ export default {
       goHome,
       focusWindow,
       closeWindow,
-      getWindowStatus
+      getWindowStatus,
     };
-  }
+  },
 };
 </script>
 

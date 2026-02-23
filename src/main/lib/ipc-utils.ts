@@ -12,11 +12,34 @@ export function registerAppHandlers(): void {
     return process.env.npm_package_name || 'Electron App';
   });
 
-  ipcMain.handle('app:getPath', async (event, name: 'home' | 'appData' | 'assets' | 'userData' | 'sessionData' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'recent' | 'logs' | 'crashDumps') => {
-    // Return path for the specified name
-    const { app } = await import('electron');
-    return app.getPath(name);
-  });
+  ipcMain.handle(
+    'app:getPath',
+    async (
+      event,
+      name:
+        | 'home'
+        | 'appData'
+        | 'assets'
+        | 'userData'
+        | 'sessionData'
+        | 'temp'
+        | 'exe'
+        | 'module'
+        | 'desktop'
+        | 'documents'
+        | 'downloads'
+        | 'music'
+        | 'pictures'
+        | 'videos'
+        | 'recent'
+        | 'logs'
+        | 'crashDumps'
+    ) => {
+      // Return path for the specified name
+      const { app } = await import('electron');
+      return app.getPath(name);
+    }
+  );
 
   ipcMain.handle('app:getLocale', () => {
     // Return app locale

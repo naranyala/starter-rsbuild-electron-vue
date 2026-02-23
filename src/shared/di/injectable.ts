@@ -7,8 +7,17 @@ const INJECTABLE_METADATA_KEY = Symbol('INJECTABLE_METADATA');
  * Type-safe Reflect interface
  */
 interface ReflectWithMetadata {
-  defineMetadata?(metadataKey: unknown, metadataValue: unknown, target: unknown, propertyKey?: unknown): void;
-  getMetadata?(metadataKey: unknown, target: unknown, propertyKey?: unknown): unknown;
+  defineMetadata?(
+    metadataKey: unknown,
+    metadataValue: unknown,
+    target: unknown,
+    propertyKey?: unknown
+  ): void;
+  getMetadata?(
+    metadataKey: unknown,
+    target: unknown,
+    propertyKey?: unknown
+  ): unknown;
 }
 
 /**
@@ -25,8 +34,10 @@ function getReflect(): ReflectWithMetadata | null {
  * Decorator to mark a class as injectable
  * @param dependencies - Optional array of dependency tokens
  */
-export function Injectable(dependencies?: Array<InjectionToken<unknown> | string>) {
-  return function <T extends new (...args: unknown[]) => unknown>(target: T) {
+export function Injectable(
+  dependencies?: Array<InjectionToken<unknown> | string>
+) {
+  return <T extends new (...args: unknown[]) => unknown>(target: T) => {
     const reflect = getReflect();
     if (reflect?.defineMetadata) {
       reflect.defineMetadata(INJECTABLE_METADATA_KEY, { dependencies }, target);
@@ -43,7 +54,9 @@ export function getInjectableMetadata(
 ): InjectableMetadata | undefined {
   const reflect = getReflect();
   if (reflect?.getMetadata) {
-    return reflect.getMetadata(INJECTABLE_METADATA_KEY, target) as InjectableMetadata | undefined;
+    return reflect.getMetadata(INJECTABLE_METADATA_KEY, target) as
+      | InjectableMetadata
+      | undefined;
   }
   return undefined;
 }
@@ -52,11 +65,21 @@ export function getInjectableMetadata(
  * Parameter decorator to inject a dependency by token
  */
 export function Inject<T>(token: InjectionToken<T> | string) {
-  return function (target: object, propertyKey: string | symbol, parameterIndex: number) {
+  return (
+    target: object,
+    propertyKey: string | symbol,
+    parameterIndex: number
+  ) => {
     const reflect = getReflect();
     if (reflect?.defineMetadata && reflect?.getMetadata) {
-      const existing = reflect.getMetadata('design:paramtypes', target, propertyKey) || [];
-      reflect.defineMetadata(`inject:${parameterIndex}`, token, target, propertyKey);
+      const existing =
+        reflect.getMetadata('design:paramtypes', target, propertyKey) || [];
+      reflect.defineMetadata(
+        `inject:${parameterIndex}`,
+        token,
+        target,
+        propertyKey
+      );
     }
   };
 }

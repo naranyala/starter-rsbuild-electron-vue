@@ -1,4 +1,4 @@
-import { ipcMain, app, type IpcMainInvokeEvent } from 'electron';
+import { app, type IpcMainInvokeEvent, ipcMain } from 'electron';
 
 /**
  * IPC Handler registration function type
@@ -77,7 +77,10 @@ export class AppServiceInstance {
   /**
    * Register a custom IPC handler
    */
-  registerHandler(channel: string, handler: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown): void {
+  registerHandler(
+    channel: string,
+    handler: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown
+  ): void {
     this.ipcMain.handle(channel, handler);
     this.handlers.set(channel, () => {
       this.ipcMain.handle(channel, handler);

@@ -4,14 +4,14 @@
  */
 
 import type {
-  EventHandler,
-  EventData,
-  SubscriptionOptions,
-  Subscription,
   EventBusConfig,
   EventBusStats,
+  EventData,
+  EventHandler,
   EventMiddleware,
   IEventBus,
+  Subscription,
+  SubscriptionOptions,
 } from './types';
 
 /**
@@ -23,7 +23,7 @@ function generateId(): string {
 
 /**
  * Core Event Bus Class
- * 
+ *
  * Features:
  * - Type-safe event handling
  * - Wildcard event patterns (e.g., 'user:*', '*.created')
@@ -248,7 +248,9 @@ export class EventBus implements IEventBus {
   /**
    * Run handlers for an event (including wildcard matches)
    */
-  private async runHandlers<TPayload>(eventData: EventData<TPayload>): Promise<void> {
+  private async runHandlers<TPayload>(
+    eventData: EventData<TPayload>
+  ): Promise<void> {
     const handlers: { sub: Subscription; startTime: number }[] = [];
 
     // Find all matching subscriptions (exact + wildcard)
@@ -278,13 +280,17 @@ export class EventBus implements IEventBus {
           this.off(sub.event, sub.handler);
         }
       } catch (error) {
-        console.error(`[EventBus:${this.config.name}] Handler error for event "${sub.event}":`, error);
+        console.error(
+          `[EventBus:${this.config.name}] Handler error for event "${sub.event}":`,
+          error
+        );
       }
     }
 
     // Update average handler time
     if (executionTimes.length > 0) {
-      const avgTime = executionTimes.reduce((a, b) => a + b, 0) / executionTimes.length;
+      const avgTime =
+        executionTimes.reduce((a, b) => a + b, 0) / executionTimes.length;
       this.handlerTimes.push(avgTime);
       // Keep last 100 measurements
       if (this.handlerTimes.length > 100) {
@@ -303,9 +309,7 @@ export class EventBus implements IEventBus {
     if (pattern === '*') return true;
 
     // Convert wildcard pattern to regex
-    const regexPattern = pattern
-      .replace(/\./g, '\\.')
-      .replace(/\*/g, '.*');
+    const regexPattern = pattern.replace(/\./g, '\\.').replace(/\*/g, '.*');
     const regex = new RegExp(`^${regexPattern}$`);
     return regex.test(event);
   }
@@ -364,7 +368,10 @@ export class EventBus implements IEventBus {
     if (!this.config.debug) return;
 
     const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] [EventBus:${this.config.name}] ${action}: ${event}`, data ?? '');
+    console.log(
+      `[${timestamp}] [EventBus:${this.config.name}] ${action}: ${event}`,
+      data ?? ''
+    );
   }
 }
 

@@ -6,19 +6,25 @@
 import type { DIContainer } from '../../shared/di';
 import { ServiceLifetime } from '../../shared/di';
 import {
-  IPC_SERVICE_TOKEN,
-  FRONTEND_WINDOW_SERVICE_TOKEN,
+  BrowserIPCServiceInstance,
+  IPCServiceInstance,
+} from '../services/ipc-service';
+import { FrontendWindowServiceInstance } from '../services/window-service';
+import {
   APP_INFO_TOKEN,
   type AppInfo,
+  FRONTEND_WINDOW_SERVICE_TOKEN,
+  IPC_SERVICE_TOKEN,
 } from './tokens';
-import { IPCServiceInstance, BrowserIPCServiceInstance } from '../services/ipc-service';
-import { FrontendWindowServiceInstance } from '../services/window-service';
 
 /**
  * Check if running in Electron
  */
 function isElectron(): boolean {
-  return typeof window !== 'undefined' && typeof (window as unknown as { require?: unknown }).require === 'function';
+  return (
+    typeof window !== 'undefined' &&
+    typeof (window as unknown as { require?: unknown }).require === 'function'
+  );
 }
 
 /**
@@ -30,7 +36,10 @@ export function registerCoreFrontendServices(container: DIContainer): void {
   if (useElectronIPC) {
     container.addFactory(IPC_SERVICE_TOKEN, () => new IPCServiceInstance());
   } else {
-    container.addFactory(IPC_SERVICE_TOKEN, () => new BrowserIPCServiceInstance());
+    container.addFactory(
+      IPC_SERVICE_TOKEN,
+      () => new BrowserIPCServiceInstance()
+    );
   }
 
   container.addFactory(FRONTEND_WINDOW_SERVICE_TOKEN, () => {
@@ -42,7 +51,10 @@ export function registerCoreFrontendServices(container: DIContainer): void {
 /**
  * Register application configuration
  */
-export function registerAppConfig(container: DIContainer, config?: Partial<AppInfo>): void {
+export function registerAppConfig(
+  container: DIContainer,
+  config?: Partial<AppInfo>
+): void {
   const appInfo: AppInfo = {
     version: config?.version ?? '0.1.2',
     name: config?.name ?? 'electron-vue-rsbuild-bun',
@@ -55,9 +67,16 @@ export function registerAppConfig(container: DIContainer, config?: Partial<AppIn
 /**
  * Register all renderer process services
  */
-export function registerAllRendererServices(container: DIContainer, config?: Partial<AppInfo>): void {
+export function registerAllRendererServices(
+  container: DIContainer,
+  config?: Partial<AppInfo>
+): void {
   registerCoreFrontendServices(container);
   registerAppConfig(container, config);
 }
 
-export { IPCServiceInstance, BrowserIPCServiceInstance, FrontendWindowServiceInstance };
+export {
+  IPCServiceInstance,
+  BrowserIPCServiceInstance,
+  FrontendWindowServiceInstance,
+};

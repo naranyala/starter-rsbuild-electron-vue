@@ -3,7 +3,7 @@
  * Provides easy-to-use navigation functions for Vue components
  */
 
-import { ref, computed, onUnmounted } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 import { getRouter, type ViewConfig, type WindowOptions } from '../router';
 import type { WinBoxInstance } from '../windows/types';
 
@@ -18,7 +18,11 @@ export interface UseWinBoxNavigationOptions {
 
 export interface UseWinBoxNavigationReturn {
   /** Navigate to a view */
-  navigate: (viewName: string, params?: Record<string, unknown>, options?: WindowOptions) => Promise<boolean>;
+  navigate: (
+    viewName: string,
+    params?: Record<string, unknown>,
+    options?: WindowOptions
+  ) => Promise<boolean>;
   /** Close current window */
   close: () => Promise<void>;
   /** Close all windows */
@@ -45,17 +49,17 @@ export interface UseWinBoxNavigationReturn {
 
 /**
  * Use WinBox Navigation in Vue components
- * 
+ *
  * @example
  * ```typescript
  * export default {
  *   setup() {
  *     const { navigate, close, currentView, windowCount } = useWinBoxNavigation();
- *     
+ *
  *     const openIntro = async () => {
  *       await navigate('electron-intro', { section: 'overview' });
  *     };
- *     
+ *
  *     return {
  *       openIntro,
  *       close,
@@ -69,20 +73,18 @@ export interface UseWinBoxNavigationReturn {
 export function useWinBoxNavigation(
   options: UseWinBoxNavigationOptions = {}
 ): UseWinBoxNavigationReturn {
-  const {
-    autoFocus = true,
-    closePrevious = false,
-    onClose,
-  } = options;
+  const { autoFocus = true, closePrevious = false, onClose } = options;
 
   const router = getRouter();
   const currentView = ref<string | null>(router.getCurrentView());
   const windowCount = ref(router.getWindowCount());
   const activeWindows = ref(router.getActiveWindows());
-  
+
   const canGoBack = computed(() => {
     const history = router.getHistory();
-    const index = history.findIndex((_, i) => i < router.getHistory().length - 1);
+    const index = history.findIndex(
+      (_, i) => i < router.getHistory().length - 1
+    );
     return index >= 0;
   });
 
@@ -142,11 +144,11 @@ export function useWinBoxNavigation(
 
     const windows = router.getActiveWindows();
     const lastWindow = Array.from(windows.entries()).pop();
-    
+
     if (lastWindow) {
       await router.close(lastWindow[0]);
       updateState();
-      
+
       if (onClose) {
         onClose();
       }
@@ -226,7 +228,9 @@ export function useWinBoxNavigation(
 export function useWindowInstance(windowId: string) {
   const router = getRouter();
   const windowData = ref(router.getActiveWindows().get(windowId));
-  const instance = ref<WinBoxInstance | null>(windowData.value?.instance ?? null);
+  const instance = ref<WinBoxInstance | null>(
+    windowData.value?.instance ?? null
+  );
 
   function updateInstance() {
     const windows = router.getActiveWindows();

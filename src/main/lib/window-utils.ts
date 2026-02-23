@@ -1,5 +1,6 @@
-import { BrowserWindow, Rectangle } from 'electron';
+import { BrowserWindow, type Rectangle } from 'electron';
 import * as path from 'path';
+import { Err, Ok, type Result } from '../../shared/result';
 
 export function createWindow(
   options: {
@@ -101,7 +102,11 @@ export function centerWindow(window: BrowserWindow): void {
   window.setPosition(x, y);
 }
 
-export function setWindowSize(window: BrowserWindow, width: number, height: number): void {
+export function setWindowSize(
+  window: BrowserWindow,
+  width: number,
+  height: number
+): void {
   window.setSize(width, height);
 }
 
@@ -109,7 +114,10 @@ export function getWindowBounds(window: BrowserWindow): Rectangle {
   return window.getBounds();
 }
 
-export function setWindowBounds(window: BrowserWindow, bounds: Rectangle): void {
+export function setWindowBounds(
+  window: BrowserWindow,
+  bounds: Rectangle
+): void {
   window.setBounds(bounds);
 }
 
@@ -145,16 +153,24 @@ export function reloadWindow(window: BrowserWindow): void {
   window.webContents.reload();
 }
 
-export function openDevTools(window: BrowserWindow, options?: Electron.OpenDevToolsOptions): void {
+export function openDevTools(
+  window: BrowserWindow,
+  options?: Electron.OpenDevToolsOptions
+): void {
   window.webContents.openDevTools(options);
 }
 
-export function createMenu(template: Electron.MenuItemConstructorOptions[]): Electron.Menu {
+export function createMenu(
+  template: Electron.MenuItemConstructorOptions[]
+): Electron.Menu {
   return require('electron').Menu.buildFromTemplate(template);
 }
 
 export function generateWindowId(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 }
 
 export function getAllDisplays(): Electron.Display[] {
@@ -204,4 +220,55 @@ export function showSaveDialog(
   options: Electron.SaveDialogOptions
 ): Promise<Electron.SaveDialogReturnValue> {
   return require('electron').dialog.showSaveDialog(window, options);
+}
+
+export function safeShowOpenDialog(
+  window: BrowserWindow,
+  options: Electron.OpenDialogOptions
+): Promise<Result<Electron.OpenDialogReturnValue, Error>> {
+  return require('electron')
+    .dialog.showOpenDialog(window, options)
+    .then((value: Electron.OpenDialogReturnValue) => Ok(value))
+    .catch((e: Error) => Err(e instanceof Error ? e : new Error(String(e))));
+}
+
+export function safeShowSaveDialog(
+  window: BrowserWindow,
+  options: Electron.SaveDialogOptions
+): Promise<Result<Electron.SaveDialogReturnValue, Error>> {
+  return require('electron')
+    .dialog.showSaveDialog(window, options)
+    .then((value: Electron.SaveDialogReturnValue) => Ok(value))
+    .catch((e: Error) => Err(e instanceof Error ? e : new Error(String(e))));
+}
+
+export function safeGetWindow(id: number): Result<BrowserWindow | null, Error> {
+  try {
+    const windows = getAllWindows();
+    return Ok(windows.find(win => win.id === id) || null);
+  } catch (e) {
+    return Err(e instanceof Error ? e : new Error(String(e)));
+  }
+}
+
+export function safeGetWindowBounds(
+  window: BrowserWindow
+): Result<Rectangle, Error> {
+  try {
+    return Ok(window.getBounds());
+  } catch (e) {
+    return Err(e instanceof Error ? e : new Error(String(e)));
+  }
+}
+
+export function safeSetWindowBounds(
+  window: BrowserWindow,
+  bounds: Rectangle
+): Result<void, Error> {
+  try {
+    window.setBounds(bounds);
+    return Ok(undefined);
+  } catch (e) {
+    return Err(e instanceof Error ? e : new Error(String(e)));
+  }
 }

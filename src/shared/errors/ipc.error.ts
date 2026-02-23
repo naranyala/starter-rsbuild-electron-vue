@@ -5,7 +5,11 @@
 import { BaseError } from './base.error';
 
 export class IPCError extends BaseError {
-  constructor(message: string, channel?: string, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    channel?: string,
+    details?: Record<string, unknown>
+  ) {
     super(message, {
       code: 'IPC_ERROR',
       details: { ...details, channel },
@@ -22,7 +26,11 @@ export class IPCChannelNotFoundError extends IPCError {
 }
 
 export class IPCValidationError extends IPCError {
-  constructor(channel: string, message: string, details?: Record<string, unknown>) {
+  constructor(
+    channel: string,
+    message: string,
+    details?: Record<string, unknown>
+  ) {
     super(`IPC validation failed: ${message}`, channel, details);
     this.name = 'IPCValidationError';
   }

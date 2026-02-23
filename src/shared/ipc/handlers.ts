@@ -3,7 +3,7 @@
  * Type-safe IPC handler definitions
  */
 
-import type { ipcMain, IpcMainInvokeEvent } from 'electron';
+import type { IpcMainInvokeEvent, ipcMain } from 'electron';
 
 /**
  * Result type for IPC operations
@@ -59,10 +59,7 @@ export function createSuccessResult<T>(data: T): IpcSuccess<T> {
 /**
  * Create a failure IPC result
  */
-export function createFailureResult(
-  error: string,
-  code?: string
-): IpcFailure {
+export function createFailureResult(error: string, code?: string): IpcFailure {
   return { success: false, error, code };
 }
 
@@ -78,7 +75,8 @@ export function withErrorHandling<TParams, TResult>(
       const result = await handler(event, params);
       return createSuccessResult(result);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       console.error(`IPC Error on channel ${channel}:`, errorMessage);
       return createFailureResult(errorMessage, 'IPC_HANDLER_ERROR');
     }

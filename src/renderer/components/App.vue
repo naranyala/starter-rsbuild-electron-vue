@@ -55,6 +55,9 @@
         </div>
       </div>
     </main>
+
+    <!-- DevTools Panel -->
+    <DevToolsPanel />
   </div>
 </template>
 
@@ -72,11 +75,13 @@ import {
   ElectronVersionsWindow,
 } from '../services';
 import Sidebar from './Sidebar.vue';
+import DevToolsPanel from './DevToolsPanel.vue';
 
 export default {
   name: 'App',
   components: {
-    Sidebar
+    Sidebar,
+    DevToolsPanel,
   },
   data() {
     return {
@@ -89,7 +94,7 @@ export default {
         { key: 'devtools', label: 'Dev Tools' },
         { key: 'perf', label: 'Performance' },
         { key: 'security', label: 'Security' },
-      ]
+      ],
     };
   },
   computed: {
@@ -106,37 +111,47 @@ export default {
       if (this.activeTab !== 'all') {
         filtered = filtered.filter(card => {
           // Map tab keys to categories or tags
-          switch(this.activeTab) {
+          switch (this.activeTab) {
             case 'ui':
-              return card.tags.includes('ui') ||
-                     card.tags.includes('components') ||
-                     card.tags.includes('rendering') ||
-                     card.category.includes('ui') ||
-                     card.title.toLowerCase().includes('ui') ||
-                     card.title.toLowerCase().includes('component');
+              return (
+                card.tags.includes('ui') ||
+                card.tags.includes('components') ||
+                card.tags.includes('rendering') ||
+                card.category.includes('ui') ||
+                card.title.toLowerCase().includes('ui') ||
+                card.title.toLowerCase().includes('component')
+              );
             case 'system':
-              return card.tags.includes('system') ||
-                     card.tags.includes('native') ||
-                     card.tags.includes('os') ||
-                     card.tags.includes('filesystem') ||
-                     card.category.includes('api') ||
-                     card.category.includes('system');
+              return (
+                card.tags.includes('system') ||
+                card.tags.includes('native') ||
+                card.tags.includes('os') ||
+                card.tags.includes('filesystem') ||
+                card.category.includes('api') ||
+                card.category.includes('system')
+              );
             case 'devtools':
-              return card.tags.includes('devtools') ||
-                     card.tags.includes('debugging') ||
-                     card.tags.includes('development') ||
-                     card.tags.includes('testing') ||
-                     card.category.includes('development');
+              return (
+                card.tags.includes('devtools') ||
+                card.tags.includes('debugging') ||
+                card.tags.includes('development') ||
+                card.tags.includes('testing') ||
+                card.category.includes('development')
+              );
             case 'perf':
-              return card.tags.includes('performance') ||
-                     card.tags.includes('optimization') ||
-                     card.tags.includes('memory') ||
-                     card.category.includes('performance');
+              return (
+                card.tags.includes('performance') ||
+                card.tags.includes('optimization') ||
+                card.tags.includes('memory') ||
+                card.category.includes('performance')
+              );
             case 'security':
-              return card.tags.includes('security') ||
-                     card.tags.includes('csp') ||
-                     card.tags.includes('authentication') ||
-                     card.category.includes('security');
+              return (
+                card.tags.includes('security') ||
+                card.tags.includes('csp') ||
+                card.tags.includes('authentication') ||
+                card.category.includes('security')
+              );
             default:
               return true;
           }
@@ -194,10 +209,11 @@ export default {
         case 'electron-versions':
           winboxInstance = ElectronVersionsWindow.create();
           break;
-        default:
+        default: {
           const { WindowFactory } = await import('../services/window-factory');
           winboxInstance = WindowFactory.createWindow(title);
           break;
+        }
       }
 
       // Register the window with the window manager if it was created successfully
@@ -226,7 +242,7 @@ export default {
       }
       this.searchTerm = '';
       this.activeTab = 'all';
-    }
+    },
   },
 };
 </script>

@@ -3,7 +3,11 @@
  * Central container for all renderer process services
  */
 
-import { DIContainer, getGlobalContainer, setGlobalContainer } from '../../shared/di';
+import {
+  DIContainer,
+  getGlobalContainer,
+  setGlobalContainer,
+} from '../../shared/di';
 import { registerAllRendererServices } from './service-providers';
 import type { AppInfo } from './tokens';
 

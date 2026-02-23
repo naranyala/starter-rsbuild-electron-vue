@@ -3,32 +3,31 @@
  * Type-safe event bus system
  */
 
-// Core types and implementation
-export { EventBus, getSharedEventBus, resetSharedEventBus } from './event-bus';
-export type {
-  EventHandler,
-  EventData,
-  SubscriptionOptions,
-  Subscription,
-  EventBusConfig,
-  EventBusStats,
-  EventMiddleware,
-  IEventBus,
-} from './types';
-
 // Event definitions
 export {
+  type AppEvents,
+  type DataEvents,
+  type ErrorEvents,
   EVENT_CATEGORIES,
+  type EventCategory,
   type EventMap,
   type EventName,
   type EventPayload,
-  type EventCategory,
-  type AppEvents,
-  type WindowEvents,
   type FileEvents,
-  type UserEvents,
   type NavigationEvents,
-  type DataEvents,
   type UIEvents,
-  type ErrorEvents,
+  type UserEvents,
+  type WindowEvents,
 } from './definitions';
+// Core types and implementation
+export { EventBus, getSharedEventBus, resetSharedEventBus } from './event-bus';
+export type {
+  EventBusConfig,
+  EventBusStats,
+  EventData,
+  EventHandler,
+  EventMiddleware,
+  IEventBus,
+  Subscription,
+  SubscriptionOptions,
+} from './types';

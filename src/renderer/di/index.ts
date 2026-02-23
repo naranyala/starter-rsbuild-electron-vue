@@ -2,26 +2,23 @@
  * Renderer Process Dependency Injection Module
  */
 
+export { provideDIContainer } from '../composables';
 export {
-  IPC_SERVICE_TOKEN,
-  FRONTEND_WINDOW_SERVICE_TOKEN,
+  createComponentScope,
+  getRendererContainer,
+  rendererContainer,
+  resetRendererContainer,
+} from './renderer-container';
+export {
+  registerAllRendererServices,
+  registerAppConfig,
+  registerCoreFrontendServices,
+} from './service-providers';
+export {
   APP_INFO_TOKEN,
   type AppInfo,
-  type IPCService,
+  FRONTEND_WINDOW_SERVICE_TOKEN,
   type FrontendWindowService,
+  IPC_SERVICE_TOKEN,
+  type IPCService,
 } from './tokens';
-
-export {
-  registerCoreFrontendServices,
-  registerAppConfig,
-  registerAllRendererServices,
-} from './service-providers';
-
-export {
-  getRendererContainer,
-  resetRendererContainer,
-  createComponentScope,
-  rendererContainer,
-} from './renderer-container';
-
-export { provideDIContainer } from '../composables';

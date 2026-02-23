@@ -2,9 +2,26 @@
  * Renderer Composables
  */
 
-export { useInject, useInjectComputed, useInjectRef, useProvide, useIsAvailable, provideDIContainer } from './useInject';
-export { useIPC } from './useIPC';
-export { useWindow } from './useWindow';
 export { useAppInfo } from './useAppInfo';
-export { useEventBus, useTypedEventBus, type UseEventBusOptions, type UseEventBusReturn } from './useEventBus';
-export { useWinBoxNavigation, useWindowInstance, type UseWinBoxNavigationOptions, type UseWinBoxNavigationReturn } from './useWinBoxNavigation';
+export {
+  type UseEventBusOptions,
+  type UseEventBusReturn,
+  useEventBus,
+  useTypedEventBus,
+} from './useEventBus';
+export {
+  provideDIContainer,
+  useInject,
+  useInjectComputed,
+  useInjectRef,
+  useIsAvailable,
+  useProvide,
+} from './useInject';
+export { useIPC } from './useIPC';
+export {
+  type UseWinBoxNavigationOptions,
+  type UseWinBoxNavigationReturn,
+  useWinBoxNavigation,
+  useWindowInstance,
+} from './useWinBoxNavigation';
+export { useWindow } from './useWindow';

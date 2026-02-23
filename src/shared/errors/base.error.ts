@@ -15,10 +15,7 @@ export class BaseError extends Error {
   public readonly cause?: Error;
   public readonly timestamp: Date;
 
-  constructor(
-    message: string,
-    options: ErrorOptions = {}
-  ) {
+  constructor(message: string, options: ErrorOptions = {}) {
     super(message);
     this.name = this.constructor.name;
     this.code = options.code ?? 'UNKNOWN_ERROR';

@@ -30,10 +30,10 @@ function getBooleanEnv(key: string, fallback: boolean): boolean {
  * Current environment configuration
  */
 export const env: EnvConfig = {
-  NODE_ENV: (getEnv('NODE_ENV', 'development') as EnvConfig['NODE_ENV']),
-  APP_ENV: (getEnv('APP_ENV', 'development') as EnvConfig['APP_ENV']),
+  NODE_ENV: getEnv('NODE_ENV', 'development') as EnvConfig['NODE_ENV'],
+  APP_ENV: getEnv('APP_ENV', 'development') as EnvConfig['APP_ENV'],
   DEBUG: getBooleanEnv('DEBUG', false),
-  LOG_LEVEL: (getEnv('LOG_LEVEL', 'info') as EnvConfig['LOG_LEVEL']),
+  LOG_LEVEL: getEnv('LOG_LEVEL', 'info') as EnvConfig['LOG_LEVEL'],
 };
 
 /**

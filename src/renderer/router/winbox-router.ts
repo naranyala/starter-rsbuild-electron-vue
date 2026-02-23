@@ -1,7 +1,7 @@
 /**
  * WinBox Router
  * A router-like solution using WinBox windows instead of traditional routing
- * 
+ *
  * Features:
  * - View registry with lazy loading
  * - Window-based navigation
@@ -28,7 +28,9 @@ export interface ViewConfig {
   /** Window options */
   windowOptions?: WindowOptions;
   /** Called before view opens */
-  beforeEnter?: (params?: Record<string, unknown>) => boolean | Promise<boolean>;
+  beforeEnter?: (
+    params?: Record<string, unknown>
+  ) => boolean | Promise<boolean>;
   /** Called when view is opened */
   onEnter?: (params?: Record<string, unknown>) => void;
   /** Called when view is closed */
@@ -85,7 +87,7 @@ export interface WinBoxRouterConfig {
 
 /**
  * WinBox Router Class
- * 
+ *
  * Manages navigation using WinBox windows instead of traditional routing
  */
 export class WinBoxRouter {
@@ -234,7 +236,9 @@ export class WinBoxRouter {
    * Close all windows
    */
   async closeAll(): Promise<void> {
-    const promises = Array.from(this.activeWindows.keys()).map(id => this.close(id));
+    const promises = Array.from(this.activeWindows.keys()).map(id =>
+      this.close(id)
+    );
     await Promise.all(promises);
     this.history = [];
     this.historyIndex = -1;
@@ -375,7 +379,9 @@ export class WinBoxRouter {
     return `${viewName}-${this.windowCounter}`;
   }
 
-  private mergeWindowOptions(...options: (WindowOptions | undefined)[]): WindowOptions {
+  private mergeWindowOptions(
+    ...options: (WindowOptions | undefined)[]
+  ): WindowOptions {
     return Object.assign({}, ...options.filter(Boolean));
   }
 

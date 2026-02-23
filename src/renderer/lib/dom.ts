@@ -253,13 +253,19 @@ export class EnhancedDOMUtils {
     return template.content;
   }
 
-  static setAttributes(element: HTMLElement, attributes: Record<string, string>): void {
+  static setAttributes(
+    element: HTMLElement,
+    attributes: Record<string, string>
+  ): void {
     Object.entries(attributes).forEach(([key, value]) => {
       element.setAttribute(key, value);
     });
   }
 
-  static getAttributes(element: HTMLElement, attributeNames: string[]): Record<string, string> {
+  static getAttributes(
+    element: HTMLElement,
+    attributeNames: string[]
+  ): Record<string, string> {
     const attributes: Record<string, string> = {};
     attributeNames.forEach(name => {
       attributes[name] = element.getAttribute(name) || '';

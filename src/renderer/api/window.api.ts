@@ -1,10 +1,10 @@
 /**
  * Window API
- * Type-safe window operations
+ * Type-safe window operations with "errors as values" pattern
  */
 
-import { invoke, send } from './base.api';
 import { IPC_CHANNELS } from '../../shared/ipc';
+import { invoke, invokeSafe, type Result, send } from './base.api';
 
 export interface WindowBounds {
   x: number;
@@ -13,53 +13,42 @@ export interface WindowBounds {
   height: number;
 }
 
-/**
- * Minimize window
- */
 export function minimize(): void {
   send(IPC_CHANNELS.WINDOW.MINIMIZE);
 }
 
-/**
- * Maximize window
- */
 export function maximize(): void {
   send(IPC_CHANNELS.WINDOW.MAXIMIZE);
 }
 
-/**
- * Close window
- */
 export function closeWindow(): void {
   send(IPC_CHANNELS.WINDOW.CLOSE);
 }
 
-/**
- * Focus window
- */
 export function focusWindow(): void {
   send(IPC_CHANNELS.WINDOW.FOCUS);
 }
 
-/**
- * Center window
- */
 export function center(): void {
   send(IPC_CHANNELS.WINDOW.CENTER);
 }
 
-/**
- * Get window bounds
- */
 export async function getBounds(): Promise<WindowBounds> {
   return invoke<WindowBounds>(IPC_CHANNELS.WINDOW.GET_BOUNDS);
 }
 
-/**
- * Set window bounds
- */
+export async function safeGetBounds(): Promise<Result<WindowBounds, Error>> {
+  return invokeSafe<WindowBounds>(IPC_CHANNELS.WINDOW.GET_BOUNDS);
+}
+
 export async function setBounds(bounds: WindowBounds): Promise<void> {
   return invoke<void>(IPC_CHANNELS.WINDOW.SET_BOUNDS, bounds);
+}
+
+export async function safeSetBounds(
+  bounds: WindowBounds
+): Promise<Result<void, Error>> {
+  return invokeSafe<void>(IPC_CHANNELS.WINDOW.SET_BOUNDS, bounds);
 }
 
 export const windowAPI = {
@@ -69,5 +58,7 @@ export const windowAPI = {
   focusWindow,
   center,
   getBounds,
+  safeGetBounds,
   setBounds,
+  safeSetBounds,
 };

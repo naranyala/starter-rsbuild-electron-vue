@@ -71,7 +71,7 @@ export const useWindowStore = defineStore('windows', () => {
 
     const chainHandler = (handlerName: HandlerName, next: () => void) => {
       const prev = instance[handlerName];
-      instance[handlerName] = function(...args: any[]) {
+      instance[handlerName] = (...args: any[]) => {
         let result;
         if (typeof prev === 'function') {
           result = prev.apply(instance, args);
@@ -83,7 +83,7 @@ export const useWindowStore = defineStore('windows', () => {
 
     if (typeof instance.hide === 'function') {
       const originalHide = instance.hide;
-      instance.hide = function(...args: any[]) {
+      instance.hide = (...args: any[]) => {
         const result = originalHide.apply(instance, args);
         updateEntry({
           hidden: true,
@@ -96,7 +96,7 @@ export const useWindowStore = defineStore('windows', () => {
 
     if (typeof instance.show === 'function') {
       const originalShow = instance.show;
-      instance.show = function(...args: any[]) {
+      instance.show = (...args: any[]) => {
         const result = originalShow.apply(instance, args);
         updateEntry({
           hidden: false,
@@ -154,7 +154,7 @@ export const useWindowStore = defineStore('windows', () => {
     }
 
     const existingOnClose = instance.onclose;
-    instance.onclose = function(...args: any[]) {
+    instance.onclose = (...args: any[]) => {
       let result;
       if (typeof existingOnClose === 'function') {
         result = existingOnClose.apply(instance, args);
@@ -167,7 +167,7 @@ export const useWindowStore = defineStore('windows', () => {
 
     if (typeof instance.close === 'function') {
       const originalClose = instance.close;
-      instance.close = function(...args: any[]) {
+      instance.close = (...args: any[]) => {
         const result = originalClose.apply(instance, args);
         if (result !== true) {
           unregisterWindow(instance);

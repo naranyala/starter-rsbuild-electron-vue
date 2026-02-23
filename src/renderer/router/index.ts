@@ -3,13 +3,13 @@
  */
 
 export {
-  WinBoxRouter,
+  type ActiveWindow,
   getRouter,
+  type NavigationResult,
   resetRouter,
   useWinBoxRouter,
-  type WinBoxRouterConfig,
   type ViewConfig,
+  WinBoxRouter,
+  type WinBoxRouterConfig,
   type WindowOptions,
-  type ActiveWindow,
-  type NavigationResult,
 } from './winbox-router';

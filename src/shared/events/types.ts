@@ -6,7 +6,10 @@
 /**
  * Event handler function type
  */
-export type EventHandler<TPayload = unknown> = (payload: TPayload, event: EventData<TPayload>) => void | Promise<void>;
+export type EventHandler<TPayload = unknown> = (
+  payload: TPayload,
+  event: EventData<TPayload>
+) => void | Promise<void>;
 
 /**
  * Event metadata
@@ -116,10 +119,7 @@ export interface IEventBus {
   /**
    * Emit an event
    */
-  emit<TPayload = unknown>(
-    event: string,
-    payload?: TPayload
-  ): Promise<void>;
+  emit<TPayload = unknown>(event: string, payload?: TPayload): Promise<void>;
 
   /**
    * Remove all listeners

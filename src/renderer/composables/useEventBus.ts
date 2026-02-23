@@ -3,9 +3,15 @@
  * Provides useEventBus composable for Vue 3 components
  */
 
-import { onMounted, onUnmounted, getCurrentInstance } from 'vue';
-import { getRendererEventBus, type RendererEventBus } from '../events/renderer-event-bus';
-import type { EventHandler, SubscriptionOptions } from '../../shared/events/types';
+import { getCurrentInstance, onMounted, onUnmounted } from 'vue';
+import type {
+  EventHandler,
+  SubscriptionOptions,
+} from '../../shared/events/types';
+import {
+  getRendererEventBus,
+  type RendererEventBus,
+} from '../events/renderer-event-bus';
 
 export interface UseEventBusOptions {
   /** Auto-subscribe on mount and unsubscribe on unmount */
@@ -52,40 +58,38 @@ export interface UseEventBusReturn {
 
 /**
  * Use Event Bus in Vue components
- * 
+ *
  * @example
  * ```typescript
  * // Basic usage
  * const { on, emit } = useEventBus();
- * 
+ *
  * on('user:login', (data) => {
  *   console.log('User logged in:', data);
  * });
- * 
+ *
  * emit('user:login', { userId: '123' });
- * 
+ *
  * // With auto-subscription
  * const { on, off } = useEventBus({ autoSubscribe: true });
- * 
+ *
  * onMounted(() => {
  *   on('data:loaded', handleData);
  * });
- * 
+ *
  * onUnmounted(() => {
  *   off('data:loaded', handleData);
  * });
- * 
+ *
  * // With scoped events
  * const { emit } = useEventBus({ scope: 'MyComponent' });
  * emit('ready'); // Emits 'MyComponent:ready'
  * ```
  */
-export function useEventBus(options: UseEventBusOptions = {}): UseEventBusReturn {
-  const {
-    autoSubscribe = true,
-    scope,
-    defaultOptions = {},
-  } = options;
+export function useEventBus(
+  options: UseEventBusOptions = {}
+): UseEventBusReturn {
+  const { autoSubscribe = true, scope, defaultOptions = {} } = options;
 
   const eventBus = getRendererEventBus({
     name: scope ?? 'renderer',
@@ -113,11 +117,11 @@ export function useEventBus(options: UseEventBusOptions = {}): UseEventBusReturn
   ): () => void {
     const finalOptions = { ...defaultOptions, ...opts };
     const unsubscribe = eventBus.on(event, handler, finalOptions);
-    
+
     if (autoSubscribe && instance) {
       subscriptions.add(unsubscribe);
     }
-    
+
     return unsubscribe;
   }
 
@@ -181,11 +185,11 @@ export function useEventBus(options: UseEventBusOptions = {}): UseEventBusReturn
 
 /**
  * Typed event subscription helper
- * 
+ *
  * @example
  * ```typescript
  * const { onTyped } = useTypedEventBus();
- * 
+ *
  * onTyped('user:login', (data) => {
  *   // data is typed as { userId: string; username: string }
  *   console.log(data.userId);

@@ -1,4 +1,8 @@
-import type { BrowserWindow, BrowserWindowConstructorOptions, Menu } from 'electron';
+import type {
+  BrowserWindow,
+  BrowserWindowConstructorOptions,
+  Menu,
+} from 'electron';
 import {
   centerWindow,
   closeWindow,
@@ -43,15 +47,15 @@ export interface WindowHandlerCallbacks {
 
 /**
  * Service for managing Electron windows
- * No decorators - plain TypeScript class
+ * Instance-based implementation with stateful window tracking
  */
-export class WindowServiceInstance {
+export class WindowService {
   private windows = new Map<string, BrowserWindow>();
 
   /**
    * Create a new window
    */
-  create(options: WindowConfig): BrowserWindow {
+  create(options: WindowConfig = { name: 'default' }): BrowserWindow {
     return createWindowUtil(options);
   }
 
@@ -167,14 +171,20 @@ export class WindowServiceInstance {
   /**
    * Show open dialog
    */
-  showOpenDialog(window: BrowserWindow, options: Electron.OpenDialogOptions): Promise<Electron.OpenDialogReturnValue> {
+  showOpenDialog(
+    window: BrowserWindow,
+    options: Electron.OpenDialogOptions
+  ): Promise<Electron.OpenDialogReturnValue> {
     return showOpenDialog(window, options);
   }
 
   /**
    * Show save dialog
    */
-  showSaveDialog(window: BrowserWindow, options: Electron.SaveDialogOptions): Promise<Electron.SaveDialogReturnValue> {
+  showSaveDialog(
+    window: BrowserWindow,
+    options: Electron.SaveDialogOptions
+  ): Promise<Electron.SaveDialogReturnValue> {
     return showSaveDialog(window, options);
   }
 
@@ -230,8 +240,8 @@ export class WindowServiceInstance {
   }
 }
 
-// Keep static class for backward compatibility
-export const WindowService = {
+// Static convenience methods for quick access without instantiation
+export const WindowServiceStatic = {
   create: createWindowUtil,
   loadUrl: loadUrlUtil,
   setupHandlers: setupWindowHandlersUtil,

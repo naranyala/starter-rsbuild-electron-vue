@@ -3,8 +3,8 @@
  * Demonstrates various event bus patterns and use cases
  */
 
-import { getMainEventBus } from '../events/main-event-bus';
 import type { EventData, EventMiddleware } from '../../shared/events';
+import { getMainEventBus } from '../events/main-event-bus';
 
 /**
  * Example 1: Basic Event Subscription
@@ -13,7 +13,7 @@ export function exampleBasicUsage(): void {
   const eventBus = getMainEventBus();
 
   // Subscribe to an event
-  const unsubscribe = eventBus.on('user:login', (data) => {
+  const unsubscribe = eventBus.on('user:login', data => {
     console.log('User logged in:', data);
   });
 
@@ -61,11 +61,13 @@ export function exampleMiddleware(): void {
   const loggingMiddleware: EventMiddleware = async (event, next) => {
     console.log(`[Middleware] Event starting: ${event.name}`);
     const start = performance.now();
-    
+
     await next();
-    
+
     const duration = performance.now() - start;
-    console.log(`[Middleware] Event completed: ${event.name} (${duration.toFixed(2)}ms)`);
+    console.log(
+      `[Middleware] Event completed: ${event.name} (${duration.toFixed(2)}ms)`
+    );
   };
 
   // Validation middleware
@@ -84,7 +86,7 @@ export function exampleMiddleware(): void {
     } catch (error) {
       console.error(`[Middleware] Error in ${event.name}:`, error);
       // Emit error event
-      void eventBus.emit('error:handled', { 
+      void eventBus.emit('error:handled', {
         error: error instanceof Error ? error.message : 'Unknown error',
         originalEvent: event.name,
       });
@@ -104,14 +106,22 @@ export function exampleRateLimiting(): void {
   const eventBus = getMainEventBus();
 
   // Debounced handler (waits for pause in events)
-  eventBus.on('window:resize', (data) => {
-    console.log('Window resized (debounced):', data);
-  }, { debounce: 300 });
+  eventBus.on(
+    'window:resize',
+    data => {
+      console.log('Window resized (debounced):', data);
+    },
+    { debounce: 300 }
+  );
 
   // Throttled handler (max once per interval)
-  eventBus.on('file:changed', (data) => {
-    console.log('File changed (throttled):', data);
-  }, { throttle: 1000 });
+  eventBus.on(
+    'file:changed',
+    data => {
+      console.log('File changed (throttled):', data);
+    },
+    { throttle: 1000 }
+  );
 
   // These will be rate-limited
   for (let i = 0; i < 10; i++) {
@@ -126,19 +136,31 @@ export function examplePriority(): void {
   const eventBus = getMainEventBus();
 
   // High priority handler runs first
-  eventBus.on('app:start', () => {
-    console.log('1. High priority handler');
-  }, { priority: 10 });
+  eventBus.on(
+    'app:start',
+    () => {
+      console.log('1. High priority handler');
+    },
+    { priority: 10 }
+  );
 
   // Medium priority
-  eventBus.on('app:start', () => {
-    console.log('2. Medium priority handler');
-  }, { priority: 5 });
+  eventBus.on(
+    'app:start',
+    () => {
+      console.log('2. Medium priority handler');
+    },
+    { priority: 5 }
+  );
 
   // Low priority runs last
-  eventBus.on('app:start', () => {
-    console.log('3. Low priority handler');
-  }, { priority: 1 });
+  eventBus.on(
+    'app:start',
+    () => {
+      console.log('3. Low priority handler');
+    },
+    { priority: 1 }
+  );
 
   void eventBus.emit('app:start');
   // Output order: 1, 2, 3
@@ -151,7 +173,7 @@ export function exampleOnce(): void {
   const eventBus = getMainEventBus();
 
   // Handler only runs once
-  eventBus.once('app:ready', (data) => {
+  eventBus.once('app:ready', data => {
     console.log('App is ready (only logged once):', data);
   });
 
@@ -216,7 +238,7 @@ export function exampleErrorHandling(): void {
   });
 
   // Error handler
-  eventBus.on('error:handled', (data) => {
+  eventBus.on('error:handled', data => {
     console.error('Handled error:', data);
   });
 
@@ -238,7 +260,7 @@ export function exampleComponentScope(): void {
     console.log('Component mounted');
   });
 
-  eventBus.on(`${componentPrefix}data-loaded`, (data) => {
+  eventBus.on(`${componentPrefix}data-loaded`, data => {
     console.log('Component data loaded:', data);
   });
 
@@ -273,7 +295,7 @@ export function exampleConditionalHandling(): void {
   // Middleware that conditionally blocks events
   const authMiddleware: EventMiddleware = async (event, next) => {
     const requiresAuth = event.name.startsWith('admin:');
-    
+
     if (requiresAuth) {
       const isAuthenticated = true; // Check your auth state
       if (!isAuthenticated) {
@@ -281,7 +303,7 @@ export function exampleConditionalHandling(): void {
         return;
       }
     }
-    
+
     await next();
   };
 

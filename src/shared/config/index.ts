@@ -3,5 +3,12 @@
  * Centralized configuration management
  */
 
-export { env, isDevelopment, isProduction, isTest, getEnvironmentName, type EnvConfig } from './env.config';
-export { appConfig, getAppInfo, type AppConfig } from './app.config';
+export { type AppConfig, appConfig, getAppInfo } from './app.config';
+export {
+  type EnvConfig,
+  env,
+  getEnvironmentName,
+  isDevelopment,
+  isProduction,
+  isTest,
+} from './env.config';

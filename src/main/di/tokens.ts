@@ -3,9 +3,9 @@
  */
 
 import { InjectionToken } from '../../shared/di';
-import { WindowService } from '../use-cases/window-service-instance';
-import { FileService } from '../use-cases/file-service-instance';
-import { AppServiceInstance } from '../use-cases/app-service-instance';
+import type { AppServiceInstance } from '../use-cases/app-service-instance';
+import type { FileService } from '../use-cases/file-service-instance';
+import type { WindowService } from '../use-cases/window.service';
 
 // Service tokens
 export const WINDOW_SERVICE_TOKEN = new InjectionToken<typeof WindowService>(
@@ -24,12 +24,10 @@ export const APP_SERVICE_TOKEN = new InjectionToken<AppServiceInstance>(
 );
 
 // Electron tokens
-export const ELECTRON_APP_TOKEN = new InjectionToken<typeof import('electron').app>(
-  'ElectronApp',
-  'Electron app instance'
-);
+export const ELECTRON_APP_TOKEN = new InjectionToken<
+  typeof import('electron').app
+>('ElectronApp', 'Electron app instance');
 
-export const ELECTRON_IPC_MAIN_TOKEN = new InjectionToken<typeof import('electron').ipcMain>(
-  'IpcMain',
-  'Electron IPC Main instance'
-);
+export const ELECTRON_IPC_MAIN_TOKEN = new InjectionToken<
+  typeof import('electron').ipcMain
+>('IpcMain', 'Electron IPC Main instance');

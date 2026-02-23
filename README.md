@@ -50,6 +50,12 @@ bun run dist
 | `bun run lint` | Run Biome linter |
 | `bun run lint:fix` | Auto-fix lint issues |
 | `bun run format` | Format code with Biome |
+| `bun run test` | Run all tests (Bun test runner) |
+| `bun run test:watch` | Run tests in watch mode |
+| `bun run test:coverage` | Run tests with coverage report |
+| `bun run test:main` | Run main process tests |
+| `bun run test:renderer` | Run renderer process tests |
+| `bun run test:shared` | Run shared utilities tests |
 | `bun run test:security` | Run security tests |
 
 ---
@@ -449,7 +455,7 @@ Comprehensive documentation is available in the `docs/` directory:
 | [Event Bus](docs/EVENT_BUS.md) | Event system documentation |
 | [WinBox Router](docs/WINBOX_ROUTER.md) | Window-based navigation |
 | [Dependency Injection](docs/DEPENDENCY_INJECTION.md) | DI system guide |
-| [Testing](docs/testing.md) | Testing strategies |
+| [Testing](docs/TESTING.md) | **Testing guide with Bun test runner** 🧪 |
 | [Deployment](docs/deployment.md) | Distribution process |
 | [Troubleshooting](docs/troubleshooting.md) | Common issues and solutions |
 | [Configuration](docs/configuration.md) | Configuration guide |

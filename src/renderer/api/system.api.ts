@@ -1,10 +1,10 @@
 /**
  * System API
- * Type-safe system operations
+ * Type-safe system operations with "errors as values" pattern
  */
 
-import { invoke, send } from './base.api';
 import { IPC_CHANNELS } from '../../shared/ipc';
+import { invoke, invokeSafe, type Result, send } from './base.api';
 
 export interface SystemInfo {
   platform: string;
@@ -17,45 +17,61 @@ export interface SystemInfo {
   tempDir: string;
 }
 
-/**
- * Get platform
- */
 export async function getPlatform(): Promise<NodeJS.Platform> {
   return invoke<NodeJS.Platform>(IPC_CHANNELS.SYSTEM.GET_PLATFORM);
 }
 
-/**
- * Get architecture
- */
+export async function safeGetPlatform(): Promise<
+  Result<NodeJS.Platform, Error>
+> {
+  return invokeSafe<NodeJS.Platform>(IPC_CHANNELS.SYSTEM.GET_PLATFORM);
+}
+
 export async function getArch(): Promise<string> {
   return invoke<string>(IPC_CHANNELS.SYSTEM.GET_ARCH);
 }
 
-/**
- * Get system info
- */
+export async function safeGetArch(): Promise<Result<string, Error>> {
+  return invokeSafe<string>(IPC_CHANNELS.SYSTEM.GET_ARCH);
+}
+
 export async function getSystemInfo(): Promise<SystemInfo> {
   return invoke<SystemInfo>(IPC_CHANNELS.SYSTEM.GET_INFO);
 }
 
-/**
- * Show item in folder (opens file explorer)
- */
+export async function safeGetSystemInfo(): Promise<Result<SystemInfo, Error>> {
+  return invokeSafe<SystemInfo>(IPC_CHANNELS.SYSTEM.GET_INFO);
+}
+
 export async function showInFolder(fullPath: string): Promise<void> {
   return invoke<void>(IPC_CHANNELS.SYSTEM.SHOW_IN_FOLDER, fullPath);
 }
 
-/**
- * Open external URL
- */
+export async function safeShowInFolder(
+  fullPath: string
+): Promise<Result<void, Error>> {
+  return invokeSafe<void>(IPC_CHANNELS.SYSTEM.SHOW_IN_FOLDER, fullPath);
+}
+
 export async function openExternal(url: string): Promise<void> {
   return invoke<void>(IPC_CHANNELS.SYSTEM.OPEN_EXTERNAL, url);
 }
 
+export async function safeOpenExternal(
+  url: string
+): Promise<Result<void, Error>> {
+  return invokeSafe<void>(IPC_CHANNELS.SYSTEM.OPEN_EXTERNAL, url);
+}
+
 export const systemAPI = {
   getPlatform,
+  safeGetPlatform,
   getArch,
+  safeGetArch,
   getSystemInfo,
+  safeGetSystemInfo,
   showInFolder,
+  safeShowInFolder,
   openExternal,
+  safeOpenExternal,
 };

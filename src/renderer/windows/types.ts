@@ -18,7 +18,7 @@ export interface WinBoxInstance {
   min?: boolean;
   /** Is window maximized */
   max?: boolean;
-  
+
   // Lifecycle callbacks
   onclose?: (...args: any[]) => any;
   onminimize?: (...args: any[]) => any;
@@ -26,7 +26,7 @@ export interface WinBoxInstance {
   onmaximize?: (...args: any[]) => any;
   onfocus?: (...args: any[]) => any;
   onblur?: (...args: any[]) => any;
-  
+
   // Methods
   close?: (...args: any[]) => any;
   minimize?: (...args: any[]) => any;

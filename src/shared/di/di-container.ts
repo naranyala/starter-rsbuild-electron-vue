@@ -1,7 +1,7 @@
+import { getInjectableMetadata } from './injectable';
 import type { InjectionToken } from './injection-token';
 import type { ServiceLifetime, ServiceMetadata } from './service-metadata';
 import { ServiceLifetime as Lifetime } from './service-metadata';
-import { getInjectableMetadata } from './injectable';
 
 /**
  * Type-safe Reflect interface for DI
@@ -25,7 +25,10 @@ function getReflect(): ReflectWithMetadata | null {
  * Manages service registration and resolution
  */
 export class DIContainer {
-  private services = new Map<string | InjectionToken<unknown>, ServiceMetadata>();
+  private services = new Map<
+    string | InjectionToken<unknown>,
+    ServiceMetadata
+  >();
   private instances = new Map<string | InjectionToken<unknown>, unknown>();
   private parent?: DIContainer;
 
@@ -72,7 +75,8 @@ export class DIContainer {
   ): this {
     return this.register(token, {
       useClass:
-        useClass ?? (typeof token === 'function' ? (token as new () => T) : undefined),
+        useClass ??
+        (typeof token === 'function' ? (token as new () => T) : undefined),
       lifetime: Lifetime.Singleton,
     });
   }
@@ -86,7 +90,8 @@ export class DIContainer {
   ): this {
     return this.register(token, {
       useClass:
-        useClass ?? (typeof token === 'function' ? (token as new () => T) : undefined),
+        useClass ??
+        (typeof token === 'function' ? (token as new () => T) : undefined),
       lifetime: Lifetime.Transient,
     });
   }
@@ -200,18 +205,20 @@ export class DIContainer {
     if (reflect?.getMetadata) {
       const paramTypes = reflect.getMetadata('design:paramtypes', useClass);
       if (paramTypes) {
-        return (paramTypes as Array<new () => unknown>).map((ParamClass: new () => unknown) => {
-          // If it's a class, try to resolve it
-          if (ParamClass) {
-            try {
-              return this.get(ParamClass);
-            } catch {
-              // If not registered, instantiate directly
-              return new ParamClass();
+        return (paramTypes as Array<new () => unknown>).map(
+          (ParamClass: new () => unknown) => {
+            // If it's a class, try to resolve it
+            if (ParamClass) {
+              try {
+                return this.get(ParamClass);
+              } catch {
+                // If not registered, instantiate directly
+                return new ParamClass();
+              }
             }
+            return undefined;
           }
-          return undefined;
-        });
+        );
       }
     }
 
@@ -229,7 +236,9 @@ export class DIContainer {
    * Check if a service is registered
    */
   isRegistered(token: InjectionToken<unknown> | string): boolean {
-    return this.services.has(token) || (this.parent?.isRegistered(token) ?? false);
+    return (
+      this.services.has(token) || (this.parent?.isRegistered(token) ?? false)
+    );
   }
 
   /**

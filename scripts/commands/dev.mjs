@@ -59,7 +59,7 @@ async function fixImports(dir) {
 
         // Check if it's a directory import (should resolve to index.js)
         const fullPath = fileDir + '/' + importPath;
-        
+
         // If it's a directory, point to index.js
         if (exists(fullPath) && exists(fullPath + '/index.js')) {
           newContent = newContent.replace(

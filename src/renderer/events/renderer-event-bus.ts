@@ -14,7 +14,10 @@ interface ElectronAPI {
     invoke: (channel: string, ...args: unknown[]) => Promise<unknown>;
     send: (channel: string, ...args: unknown[]) => void;
     on: (channel: string, listener: (...args: unknown[]) => void) => () => void;
-    once: (channel: string, listener: (...args: unknown[]) => void) => () => void;
+    once: (
+      channel: string,
+      listener: (...args: unknown[]) => void
+    ) => () => void;
     removeAllListeners: (channel: string) => void;
   };
 }
@@ -111,7 +114,12 @@ export class RendererEventBus extends EventBus {
     const unsubscribe = this.electronAPI.ipc.on(
       channel,
       (...args: unknown[]) => {
-        const data = args[0] as { event: string; payload: unknown; source: string; timestamp: number };
+        const data = args[0] as {
+          event: string;
+          payload: unknown;
+          source: string;
+          timestamp: number;
+        };
         const { event, payload } = data;
 
         this.log('receive-from-main', event, { source: data.source });
@@ -189,7 +197,13 @@ export class ScopedEventBus {
     handler: (payload: TPayload) => void | Promise<void>
   ): () => void {
     const scopedEvent = this.scopePrefix + event;
-    const unsubscribe = this.parent.on(scopedEvent, handler as (payload: TPayload, event: { name: string; payload: TPayload }) => void);
+    const unsubscribe = this.parent.on(
+      scopedEvent,
+      handler as (
+        payload: TPayload,
+        event: { name: string; payload: TPayload }
+      ) => void
+    );
     this.subscriptions.push(unsubscribe);
     return unsubscribe;
   }
@@ -216,7 +230,9 @@ export class ScopedEventBus {
  */
 let rendererEventBus: RendererEventBus | null = null;
 
-export function getRendererEventBus(config?: RendererEventBusConfig): RendererEventBus {
+export function getRendererEventBus(
+  config?: RendererEventBusConfig
+): RendererEventBus {
   if (!rendererEventBus) {
     rendererEventBus = new RendererEventBus(config);
   }

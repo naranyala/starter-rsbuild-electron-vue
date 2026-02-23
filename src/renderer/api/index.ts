@@ -1,67 +1,96 @@
 /**
  * Renderer API Module
- * Type-safe API layer for renderer process
+ * Type-safe API layer for renderer process with "errors as values" pattern
  */
 
-export { invoke, send, on, once, removeAllListeners } from './base.api';
+export {
+  Err,
+  invoke,
+  invokeSafe,
+  isErr,
+  isOk,
+  Ok,
+  on,
+  once,
+  type Result,
+  removeAllListeners,
+  send,
+} from './base.api';
 
 export {
-  type ReadFileResult,
-  type WriteFileParams,
-  type ExistsResult,
-  type MkdirParams,
-  type ReaddirResult,
   type DeleteFileParams,
-  readFile,
-  writeFile,
-  exists,
-  mkdir,
-  readdir,
   deleteFile,
-  fileSystemAPI,
+  type ExistsResult,
+  exists,
+  type MkdirParams,
+  mkdir,
+  type ReaddirResult,
+  type ReadFileResult,
+  readdir,
+  readFile,
+  safeDeleteFile,
+  safeExists,
+  safeMkdir,
+  safeReaddir,
+  safeReadFile,
+  safeWriteFile,
+  type WriteFileParams,
+  writeFile,
 } from './file.api';
+
+import { fileSystemAPI } from './file.api';
+export { fileSystemAPI };
 
 export {
   type AppInfo,
-  getVersion,
+  focus,
+  getInfo,
   getName,
   getPath,
-  getInfo,
+  getVersion,
   quit,
-  focus,
+  safeGetInfo,
+  safeGetName,
+  safeGetPath,
+  safeGetVersion,
   setBadgeCount,
-  appAPI,
 } from './app.api';
 
+import { appAPI } from './app.api';
+export { appAPI };
+
 export {
-  type WindowBounds,
-  minimize,
-  maximize,
+  center,
   closeWindow,
   focusWindow,
-  center,
   getBounds,
+  maximize,
+  minimize,
+  safeGetBounds,
+  safeSetBounds,
   setBounds,
-  windowAPI,
+  type WindowBounds,
 } from './window.api';
 
+import { windowAPI } from './window.api';
+export { windowAPI };
+
 export {
-  type SystemInfo,
-  getPlatform,
   getArch,
+  getPlatform,
   getSystemInfo,
-  showInFolder,
   openExternal,
-  systemAPI,
+  type SystemInfo,
+  safeGetArch,
+  safeGetPlatform,
+  safeGetSystemInfo,
+  safeOpenExternal,
+  safeShowInFolder,
+  showInFolder,
 } from './system.api';
 
-/**
- * Combined API object for convenience
- */
-import { fileSystemAPI } from './file.api';
-import { appAPI } from './app.api';
-import { windowAPI } from './window.api';
 import { systemAPI } from './system.api';
+export { systemAPI };
 
 export const api = {
   fs: fileSystemAPI,

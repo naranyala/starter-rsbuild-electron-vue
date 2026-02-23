@@ -9,7 +9,15 @@
  * - Hierarchical containers (parent/child scopes)
  */
 
-export { DIContainer, getGlobalContainer, setGlobalContainer } from './di-container';
-export { Injectable, Inject, getInjectableMetadata } from './injectable';
+export {
+  DIContainer,
+  getGlobalContainer,
+  setGlobalContainer,
+} from './di-container';
+export { getInjectableMetadata, Inject, Injectable } from './injectable';
 export { InjectionToken } from './injection-token';
-export { ServiceLifetime, type ServiceMetadata, type InjectableMetadata } from './service-metadata';
+export {
+  type InjectableMetadata,
+  ServiceLifetime,
+  type ServiceMetadata,
+} from './service-metadata';

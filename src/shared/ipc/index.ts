@@ -3,15 +3,15 @@
  * Type-safe IPC communication utilities
  */
 
-export { IPC_CHANNELS, getAllChannels, type IpcChannel } from './channels';
+export { getAllChannels, IPC_CHANNELS, type IpcChannel } from './channels';
 export {
-  type IpcResult,
-  type IpcSuccess,
+  createFailureResult,
+  createSuccessResult,
   type IpcFailure,
   type IpcHandler,
   type IpcHandlerRegistration,
-  createSuccessResult,
-  createFailureResult,
-  withErrorHandling,
+  type IpcResult,
+  type IpcSuccess,
   registerIpcHandlers,
+  withErrorHandling,
 } from './handlers';

@@ -1,5 +1,5 @@
-import { onUnmounted as vueOnUnmounted, ref as vueRef } from 'vue';
 import type { Ref } from 'vue';
+import { onUnmounted as vueOnUnmounted, ref as vueRef } from 'vue';
 
 // Re-export vue functions to avoid naming conflicts
 export { vueOnUnmounted as onUnmounted, vueRef as ref };
@@ -328,16 +328,28 @@ function watchTarget<T>(
 }
 
 export class EnhancedEventUtils {
-  static createCustomEvent<T>(type: string, detail?: T, options?: CustomEventInit<T>): CustomEvent<T> {
+  static createCustomEvent<T>(
+    type: string,
+    detail?: T,
+    options?: CustomEventInit<T>
+  ): CustomEvent<T> {
     return new CustomEvent(type, { detail, ...options });
   }
 
-  static dispatchCustomEvent<T>(target: EventTarget, type: string, detail?: T): boolean {
-    const event = this.createCustomEvent(type, detail);
+  static dispatchCustomEvent<T>(
+    target: EventTarget,
+    type: string,
+    detail?: T
+  ): boolean {
+    const event = EnhancedEventUtils.createCustomEvent(type, detail);
     return target.dispatchEvent(event);
   }
 
-  static once(target: EventTarget, eventType: string, options?: AddEventListenerOptions): Promise<Event> {
+  static once(
+    target: EventTarget,
+    eventType: string,
+    options?: AddEventListenerOptions
+  ): Promise<Event> {
     return new Promise(resolve => {
       const listener = (event: Event) => {
         target.removeEventListener(eventType, listener, options);
@@ -347,7 +359,12 @@ export class EnhancedEventUtils {
     });
   }
 
-  static on(target: EventTarget, eventType: string, handler: EventListener, options?: AddEventListenerOptions): () => void {
+  static on(
+    target: EventTarget,
+    eventType: string,
+    handler: EventListener,
+    options?: AddEventListenerOptions
+  ): () => void {
     target.addEventListener(eventType, handler, options);
     return () => target.removeEventListener(eventType, handler, options);
   }
@@ -357,23 +374,23 @@ export class EventBus {
   private static emitter = new EventEmitter();
 
   static on(event: string, callback: Function): () => void {
-    return this.emitter.on(event, callback);
+    return EventBus.emitter.on(event, callback);
   }
 
   static once(event: string, callback: Function): void {
-    this.emitter.once(event, callback);
+    EventBus.emitter.once(event, callback);
   }
 
   static off(event: string, callback: Function): void {
-    this.emitter.off(event, callback);
+    EventBus.emitter.off(event, callback);
   }
 
   static emit(event: string, ...args: any[]): void {
-    this.emitter.emit(event, ...args);
+    EventBus.emitter.emit(event, ...args);
   }
 
   static removeAllListeners(event?: string): void {
-    this.emitter.removeAllListeners(event);
+    EventBus.emitter.removeAllListeners(event);
   }
 }
 

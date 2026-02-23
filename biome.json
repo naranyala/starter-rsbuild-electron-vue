@@ -1,43 +1,192 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "src/**/*",
+      "scripts/**/*",
+      "*.ts",
+      "*.js",
+      "*.mjs",
+      "*.cjs",
+      "*.vue",
+      "*.json",
+      "!!**/node_modules",
+      "!!**/dist",
+      "!!**/dist-ts",
+      "!!**/build",
+      "!!**/reports",
+      "!!**/.git",
+      "!!**/.qwen",
+      "!!**/*.min.js",
+      "!!**/*.min.css",
+      "!!**/scripts/legacy"
+    ]
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 80
-  },
-  "javascript": {
-    "formatter": {
-      "arrowParentheses": "asNeeded",
-      "bracketSpacing": true,
-      "trailingCommas": "es5",
-      "semicolons": "always",
-      "quoteStyle": "single"
-    }
+    "lineWidth": 80,
+    "lineEnding": "lf",
+    "attributePosition": "auto",
+    "formatWithErrors": true
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noExplicitAny": "off",
-        "noArrayIndexKey": "off"
+      "correctness": {
+        "recommended": true,
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "noUnusedFunctionParameters": "warn",
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "error",
+        "noSetterReturn": "error",
+        "noUndeclaredDependencies": "off",
+        "noUnknownProperty": "off"
       },
       "style": {
+        "recommended": true,
         "useFragmentSyntax": "error",
-        "useSelfClosingElements": "error"
+        "useSelfClosingElements": "error",
+        "noParameterAssign": "warn",
+        "noNonNullAssertion": "off",
+        "useImportType": "error"
+      },
+      "suspicious": {
+        "recommended": true,
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn",
+        "noConsole": "warn",
+        "noDoubleEquals": "error",
+        "noRedeclare": "error",
+        "noUnsafeDeclarationMerging": "error"
       },
       "complexity": {
+        "recommended": true,
         "noForEach": "off",
-        "noImportantStyles": "off"
+        "noImportantStyles": "off",
+        "noUselessFragments": "warn",
+        "useArrowFunction": "warn",
+        "useLiteralKeys": "warn",
+        "noBannedTypes": "error"
       },
-      "correctness": {
-        "noUnknownProperty": "off"
+      "performance": {
+        "recommended": true,
+        "noDelete": "off",
+        "noAccumulatingSpread": "warn"
+      },
+      "security": {
+        "recommended": true
+      },
+      "a11y": {
+        "recommended": true,
+        "noSvgWithoutTitle": "off",
+        "useKeyWithClickEvents": "off"
       }
     }
   },
-  "files": {
-    "ignoreUnknown": true,
-    "includes": ["src/**/*", "scripts/**/*"]
-  }
+  "javascript": {
+    "formatter": {
+      "enabled": true,
+      "arrowParentheses": "asNeeded",
+      "bracketSameLine": false,
+      "bracketSpacing": true,
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "lineEnding": "lf"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": false
+    },
+    "globals": ["defineProps", "defineEmits", "defineExpose", "withDefaults"]
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 80,
+      "trailingCommas": "none"
+    },
+    "parser": {
+      "allowComments": true,
+      "allowTrailingCommas": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": "off",
+            "noUnusedVariables": "off"
+          },
+          "style": {
+            "useImportType": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/renderer/**/*.ts", "src/renderer/**/*.vue"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/main/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["scripts/**/*.mjs", "scripts/**/*.js"],
+      "javascript": {
+        "globals": [
+          "process",
+          "require",
+          "module",
+          "exports",
+          "__dirname",
+          "__filename",
+          "import",
+          "Buffer"
+        ]
+      }
+    },
+    {
+      "includes": ["**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          },
+          "style": {
+            "noParameterAssign": "off"
+          }
+        }
+      }
+    }
+  ]
 }

@@ -3,8 +3,8 @@ import App from './components/App.vue';
 import './reset.css';
 import './index.css';
 import './styles/global.css';
-import { pinia } from './stores/pinia';
 import { getRendererContainer, provideDIContainer } from './di';
+import { pinia } from './stores/pinia';
 
 // Initialize the renderer DI container
 const container = getRendererContainer({

@@ -3,10 +3,10 @@
  * Extends shared EventBus with Electron-specific features
  */
 
+import type { IpcMain } from 'electron';
 import { EventBus, getSharedEventBus } from '../../shared/events/event-bus';
 import type { EventBusConfig, EventData } from '../../shared/events/types';
 import { IPC_CHANNELS } from '../../shared/ipc';
-import type { IpcMain } from 'electron';
 
 /**
  * Main process event bus configuration
@@ -20,7 +20,7 @@ export interface MainEventBusConfig extends EventBusConfig {
 
 /**
  * Main Process Event Bus
- * 
+ *
  * Features:
  * - All shared EventBus features
  * - IPC bridge to renderer process
@@ -78,26 +78,29 @@ export class MainEventBus extends EventBus {
     if (!this.ipcMain) return;
 
     const channel = `${this.ipcChannel}:emit`;
-    
-    this.ipcMain.handle(channel, async (event, data: { event: string; payload: unknown }) => {
-      const { event: eventName, payload } = data;
-      
-      this.log('ipc-receive', eventName, {
-        fromWindowId: event.sender.id,
-        payload,
-      });
 
-      // Add source information
-      const enrichedPayload = Object.assign({}, payload, {
-        _source: {
-          process: 'renderer' as const,
-          windowId: event.sender.id,
-        },
-      });
+    this.ipcMain.handle(
+      channel,
+      async (event, data: { event: string; payload: unknown }) => {
+        const { event: eventName, payload } = data;
 
-      await super.emit(eventName, enrichedPayload);
-      return { success: true };
-    });
+        this.log('ipc-receive', eventName, {
+          fromWindowId: event.sender.id,
+          payload,
+        });
+
+        // Add source information
+        const enrichedPayload = Object.assign({}, payload, {
+          _source: {
+            process: 'renderer' as const,
+            windowId: event.sender.id,
+          },
+        });
+
+        await super.emit(eventName, enrichedPayload);
+        return { success: true };
+      }
+    );
 
     this.log('ipc-listener-setup', channel);
   }
@@ -105,7 +108,10 @@ export class MainEventBus extends EventBus {
   /**
    * Forward event to all renderer windows
    */
-  private forwardToRenderers<TPayload>(event: string, payload?: TPayload): void {
+  private forwardToRenderers<TPayload>(
+    event: string,
+    payload?: TPayload
+  ): void {
     if (!this.ipcMain) return;
 
     const { BrowserWindow } = require('electron') as typeof import('electron');

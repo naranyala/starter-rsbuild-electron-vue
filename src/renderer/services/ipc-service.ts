@@ -48,7 +48,10 @@ export class IPCServiceInstance {
     const { ipcRenderer } = window.require('electron');
 
     // Wrap callback to track it
-    const wrappedCallback = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => {
+    const wrappedCallback = (
+      _event: Electron.IpcRendererEvent,
+      ...args: unknown[]
+    ) => {
       callback(...args);
     };
 
@@ -78,7 +81,10 @@ export class IPCServiceInstance {
 
     const { ipcRenderer } = window.require('electron');
 
-    const wrappedCallback = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => {
+    const wrappedCallback = (
+      _event: Electron.IpcRendererEvent,
+      ...args: unknown[]
+    ) => {
       callback(...args);
     };
 
@@ -106,7 +112,10 @@ export class IPCServiceInstance {
    * Check if running in Electron renderer process
    */
   private isElectron(): boolean {
-    return typeof window !== 'undefined' && typeof (window as unknown as { require?: unknown }).require === 'function';
+    return (
+      typeof window !== 'undefined' &&
+      typeof (window as unknown as { require?: unknown }).require === 'function'
+    );
   }
 
   /**

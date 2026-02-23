@@ -4,13 +4,13 @@
  */
 
 import { getRouter, type ViewConfig } from '../router';
-import ElectronIntro from '../use-cases/ElectronIntro.vue';
 import ElectronArchitecture from '../use-cases/ElectronArchitecture.vue';
-import ElectronSecurity from '../use-cases/ElectronSecurity.vue';
-import ElectronPackaging from '../use-cases/ElectronPackaging.vue';
-import ElectronNativeAPIs from '../use-cases/ElectronNativeAPIs.vue';
-import ElectronPerformance from '../use-cases/ElectronPerformance.vue';
 import ElectronDevelopment from '../use-cases/ElectronDevelopment.vue';
+import ElectronIntro from '../use-cases/ElectronIntro.vue';
+import ElectronNativeAPIs from '../use-cases/ElectronNativeAPIs.vue';
+import ElectronPackaging from '../use-cases/ElectronPackaging.vue';
+import ElectronPerformance from '../use-cases/ElectronPerformance.vue';
+import ElectronSecurity from '../use-cases/ElectronSecurity.vue';
 import ElectronVersions from '../use-cases/ElectronVersions.vue';
 
 /**
@@ -26,7 +26,7 @@ export const views: ViewConfig[] = [
       height: 450,
       background: '#1a1a2e',
     },
-    onEnter: (params) => {
+    onEnter: params => {
       console.log('Electron Intro opened', params);
     },
   },
@@ -117,7 +117,7 @@ export function initializeRouter(): void {
   });
 
   router.registerViews(views);
-  
+
   console.log('[ViewRegistry] Router initialized with', views.length, 'views');
 }
 

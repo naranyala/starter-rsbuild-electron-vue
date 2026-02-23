@@ -5,17 +5,32 @@
 
 import { BaseError } from './base.error';
 
+export type { Result } from '../result';
+export {
+  Err,
+  flatMap,
+  fromPromise,
+  fromTry,
+  isErr,
+  isOk,
+  map,
+  mapErr,
+  Ok,
+  unwrap,
+  unwrapErr,
+  unwrapOr,
+} from '../result';
 export { BaseError, type ErrorOptions } from './base.error';
 export {
-  IPCError,
   IPCChannelNotFoundError,
-  IPCValidationError,
+  IPCError,
   IPCTimeoutError,
+  IPCValidationError,
 } from './ipc.error';
 export {
-  ValidationError,
   ConfigurationError,
   FileNotFoundError,
+  ValidationError,
 } from './validation.error';
 
 /**

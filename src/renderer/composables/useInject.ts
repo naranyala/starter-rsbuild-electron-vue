@@ -6,20 +6,29 @@
  * natively with Vue 3's composition API.
  */
 
-import { inject, provide, type InjectionKey, type Ref, type ComputedRef } from 'vue';
-import { getRendererContainer } from '../di';
+import {
+  type ComputedRef,
+  type InjectionKey,
+  inject,
+  provide,
+  type Ref,
+} from 'vue';
 import type { InjectionToken } from '../../shared/di';
+import { getRendererContainer } from '../di';
 
 /**
  * Key for the container injection
  */
-const CONTAINER_KEY: InjectionKey<ReturnType<typeof getRendererContainer>> = Symbol('DIContainer');
+const CONTAINER_KEY: InjectionKey<ReturnType<typeof getRendererContainer>> =
+  Symbol('DIContainer');
 
 /**
  * Provide the DI container to child components
  * Call this in your root component or main.ts
  */
-export function provideDIContainer(container?: ReturnType<typeof getRendererContainer>): void {
+export function provideDIContainer(
+  container?: ReturnType<typeof getRendererContainer>
+): void {
   const diContainer = container ?? getRendererContainer();
   provide(CONTAINER_KEY, diContainer);
 }
@@ -29,8 +38,12 @@ export function provideDIContainer(container?: ReturnType<typeof getRendererCont
  * @param token - The injection token
  * @param fallback - Optional fallback value if not found
  */
-export function useInject<T>(token: InjectionToken<T> | string, fallback?: T): T {
-  const container = inject<ReturnType<typeof getRendererContainer>>(CONTAINER_KEY);
+export function useInject<T>(
+  token: InjectionToken<T> | string,
+  fallback?: T
+): T {
+  const container =
+    inject<ReturnType<typeof getRendererContainer>>(CONTAINER_KEY);
 
   if (container) {
     try {
@@ -69,7 +82,10 @@ export function useInjectComputed<T>(
  * Inject a dependency as a ref
  * Useful for mutable dependencies
  */
-export function useInjectRef<T>(token: InjectionToken<T> | string, fallback?: T): Ref<T> {
+export function useInjectRef<T>(
+  token: InjectionToken<T> | string,
+  fallback?: T
+): Ref<T> {
   const { ref } = require('vue');
   const value = useInject(token, fallback);
   return ref(value);
@@ -78,8 +94,12 @@ export function useInjectRef<T>(token: InjectionToken<T> | string, fallback?: T)
 /**
  * Provide a value for dependency injection
  */
-export function useProvide<T>(token: InjectionToken<T> | string, value: T): void {
-  const container = inject<ReturnType<typeof getRendererContainer>>(CONTAINER_KEY);
+export function useProvide<T>(
+  token: InjectionToken<T> | string,
+  value: T
+): void {
+  const container =
+    inject<ReturnType<typeof getRendererContainer>>(CONTAINER_KEY);
 
   if (container) {
     container.addValue(token, value);
@@ -89,8 +109,11 @@ export function useProvide<T>(token: InjectionToken<T> | string, value: T): void
 /**
  * Check if a token is available
  */
-export function useIsAvailable(token: InjectionToken<unknown> | string): boolean {
-  const container = inject<ReturnType<typeof getRendererContainer>>(CONTAINER_KEY);
+export function useIsAvailable(
+  token: InjectionToken<unknown> | string
+): boolean {
+  const container =
+    inject<ReturnType<typeof getRendererContainer>>(CONTAINER_KEY);
 
   if (container) {
     return container.isRegistered(token);

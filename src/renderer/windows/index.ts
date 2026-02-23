@@ -6,34 +6,34 @@ class WindowManager {
   private static windows: WinBoxWrapper[] = [];
 
   static addWindow(window: WinBoxWrapper) {
-    this.windows.push(window);
+    WindowManager.windows.push(window);
   }
 
   static removeWindow(window: WinBoxWrapper) {
-    const index = this.windows.indexOf(window);
+    const index = WindowManager.windows.indexOf(window);
     if (index !== -1) {
-      this.windows.splice(index, 1);
+      WindowManager.windows.splice(index, 1);
     }
   }
 
   static getWindows(): WinBoxWrapper[] {
-    return [...this.windows]; // Return a copy to prevent external modification
+    return [...WindowManager.windows]; // Return a copy to prevent external modification
   }
 
   static minimizeAll() {
-    this.windows.forEach(window => {
+    WindowManager.windows.forEach(window => {
       window.minimize();
     });
   }
 
   static restoreAll() {
-    this.windows.forEach(window => {
+    WindowManager.windows.forEach(window => {
       window.restore();
     });
   }
 
   static closeAll() {
-    [...this.windows].forEach(window => {
+    [...WindowManager.windows].forEach(window => {
       window.close(); // This will automatically remove it from the array
     });
   }
@@ -74,7 +74,7 @@ class WinBoxWrapper implements WinBoxInstance {
   private originalY = 0;
   private originalWidth = 0;
   private originalHeight = 0;
-  
+
   // Implement the WinBox-like interface properties
   title?: string;
   hidden = false;
@@ -87,7 +87,11 @@ class WinBoxWrapper implements WinBoxInstance {
   onfocus?: (...args: any[]) => any;
   onblur?: (...args: any[]) => any;
 
-  constructor(title: string, content: string, options?: { width?: number; height?: number; x?: number; y?: number }) {
+  constructor(
+    title: string,
+    content: string,
+    options?: { width?: number; height?: number; x?: number; y?: number }
+  ) {
     const width = options?.width || 800;
     const height = options?.height || 600;
     const x = options?.x || 50;
@@ -236,33 +240,43 @@ class WinBoxWrapper implements WinBoxInstance {
 
   private setupEventListeners() {
     // Drag functionality
-    this.titleBar.addEventListener('mousedown', (e) => {
-      if (e.target !== this.minimizeBtn && e.target !== this.maximizeBtn && e.target !== this.closeBtn) {
+    this.titleBar.addEventListener('mousedown', e => {
+      if (
+        e.target !== this.minimizeBtn &&
+        e.target !== this.maximizeBtn &&
+        e.target !== this.closeBtn
+      ) {
         this.isDragging = true;
         this.dragOffsetX = e.clientX - this.element.offsetLeft;
         this.dragOffsetY = e.clientY - this.element.offsetTop;
-        
+
         // Bring to front
         this.element.style.zIndex = `${Date.now()}`;
-        
+
         // Trigger focus event
         if (this.onfocus) {
           this.onfocus();
         }
-        
+
         e.preventDefault();
       }
     });
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', e => {
       if (this.isDragging) {
         const newX = e.clientX - this.dragOffsetX;
         const newY = e.clientY - this.dragOffsetY;
-        
+
         // Boundary checks
-        const boundedX = Math.max(0, Math.min(window.innerWidth - this.element.offsetWidth, newX));
-        const boundedY = Math.max(0, Math.min(window.innerHeight - this.element.offsetHeight, newY));
-        
+        const boundedX = Math.max(
+          0,
+          Math.min(window.innerWidth - this.element.offsetWidth, newX)
+        );
+        const boundedY = Math.max(
+          0,
+          Math.min(window.innerHeight - this.element.offsetHeight, newY)
+        );
+
         this.element.style.left = `${boundedX}px`;
         this.element.style.top = `${boundedY}px`;
       }
@@ -270,7 +284,7 @@ class WinBoxWrapper implements WinBoxInstance {
 
     document.addEventListener('mouseup', () => {
       this.isDragging = false;
-      
+
       // Trigger blur event when releasing drag
       if (this.onblur) {
         this.onblur();
@@ -297,7 +311,8 @@ class WinBoxWrapper implements WinBoxInstance {
 
     // Maximize button
     this.maximizeBtn.addEventListener('click', () => {
-      if (this.element.style.width === 'calc(100vw - 320px)') { // Account for sidebar width (300px + 20px padding)
+      if (this.element.style.width === 'calc(100vw - 320px)') {
+        // Account for sidebar width (300px + 20px padding)
         // Restore to original size
         this.element.style.width = `${this.originalWidth}px`;
         this.element.style.height = `${this.originalHeight}px`;
@@ -343,7 +358,8 @@ class WinBoxWrapper implements WinBoxInstance {
   focus() {
     this.element.style.zIndex = `${Date.now()}`;
     // Ensure the window doesn't go under the sidebar when brought to front
-    if (parseInt(this.element.style.left) < 310) { // If window is positioned to the left of the sidebar
+    if (parseInt(this.element.style.left) < 310) {
+      // If window is positioned to the left of the sidebar
       this.element.style.left = '310px'; // Position it to the right of the sidebar
     }
     if (this.onfocus) {
@@ -395,11 +411,11 @@ export class ElectronIntroWindow {
       '<div><h2>Electron Introduction</h2><p>Welcome to Electron development!</p></div>',
       { width: 800, height: 600, x: 100, y: 50 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Intro', window);
-    
+
     return window;
   }
 }
@@ -411,11 +427,11 @@ export class ElectronArchitectureWindow {
       '<div><h2>Electron Architecture</h2><p>Main and Renderer processes...</p></div>',
       { width: 800, height: 600, x: 150, y: 100 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Architecture', window);
-    
+
     return window;
   }
 }
@@ -427,11 +443,11 @@ export class ElectronSecurityWindow {
       '<div><h2>Electron Security</h2><p>Security best practices...</p></div>',
       { width: 800, height: 600, x: 200, y: 150 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Security', window);
-    
+
     return window;
   }
 }
@@ -443,11 +459,11 @@ export class ElectronPackagingWindow {
       '<div><h2>Electron Packaging</h2><p>How to package your app...</p></div>',
       { width: 800, height: 600, x: 250, y: 200 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Packaging', window);
-    
+
     return window;
   }
 }
@@ -459,11 +475,11 @@ export class ElectronNativeAPIsWindow {
       '<div><h2>Electron Native APIs</h2><p>Accessing native OS features...</p></div>',
       { width: 800, height: 600, x: 300, y: 250 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Native APIs', window);
-    
+
     return window;
   }
 }
@@ -475,11 +491,11 @@ export class ElectronPerformanceWindow {
       '<div><h2>Electron Performance</h2><p>Optimizing performance...</p></div>',
       { width: 800, height: 600, x: 350, y: 300 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Performance', window);
-    
+
     return window;
   }
 }
@@ -491,11 +507,11 @@ export class ElectronDevelopmentWindow {
       '<div><h2>Electron Development</h2><p>Development workflow...</p></div>',
       { width: 800, height: 600, x: 400, y: 350 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Development', window);
-    
+
     return window;
   }
 }
@@ -507,27 +523,36 @@ export class ElectronVersionsWindow {
       '<div><h2>Electron Versions</h2><p>Version management...</p></div>',
       { width: 800, height: 600, x: 450, y: 400 }
     );
-    
+
     // Register with the store
     const store = useWindowStore();
     store.registerWindow('Electron Versions', window);
-    
+
     return window;
   }
 }
 
 export class WindowFactory {
   static createWindow(type: string) {
-    switch(type) {
-      case 'intro': return ElectronIntroWindow.create();
-      case 'architecture': return ElectronArchitectureWindow.create();
-      case 'security': return ElectronSecurityWindow.create();
-      case 'packaging': return ElectronPackagingWindow.create();
-      case 'native-apis': return ElectronNativeAPIsWindow.create();
-      case 'performance': return ElectronPerformanceWindow.create();
-      case 'development': return ElectronDevelopmentWindow.create();
-      case 'versions': return ElectronVersionsWindow.create();
-      default: return ElectronIntroWindow.create();
+    switch (type) {
+      case 'intro':
+        return ElectronIntroWindow.create();
+      case 'architecture':
+        return ElectronArchitectureWindow.create();
+      case 'security':
+        return ElectronSecurityWindow.create();
+      case 'packaging':
+        return ElectronPackagingWindow.create();
+      case 'native-apis':
+        return ElectronNativeAPIsWindow.create();
+      case 'performance':
+        return ElectronPerformanceWindow.create();
+      case 'development':
+        return ElectronDevelopmentWindow.create();
+      case 'versions':
+        return ElectronVersionsWindow.create();
+      default:
+        return ElectronIntroWindow.create();
     }
   }
 }
@@ -555,5 +580,5 @@ export const windowManager = {
     if (targetWindow.hidden || targetWindow.min) {
       targetWindow.show();
     }
-  }
+  },
 };

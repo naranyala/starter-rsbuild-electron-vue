@@ -2,8 +2,8 @@
  * Composable for window operations
  */
 
-import { useInject } from './useInject';
 import { FRONTEND_WINDOW_SERVICE_TOKEN } from '../di';
+import { useInject } from './useInject';
 
 /**
  * Composable for window management

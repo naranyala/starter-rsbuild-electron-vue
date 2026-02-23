@@ -5,14 +5,14 @@
 
 import {
   AsyncResult,
-  Result,
-  SanitizationOptions,
-  ValidationResult,
-  ValidationRule,
-  ValidationSchema,
-  Ok,
   Err,
-  JsonValue
+  type JsonValue,
+  Ok,
+  type Result,
+  type SanitizationOptions,
+  type ValidationResult,
+  type ValidationRule,
+  type ValidationSchema,
 } from './types';
 
 // ===========================================
@@ -428,7 +428,10 @@ export function deepMerge<T extends Record<string, any>>(
       typeof source[typedKey] === 'object' &&
       !Array.isArray(source[typedKey])
     ) {
-      result[typedKey] = deepMerge(target[typedKey] || {}, source[typedKey]) as T[keyof T];
+      result[typedKey] = deepMerge(
+        target[typedKey] || {},
+        source[typedKey]
+      ) as T[keyof T];
     } else {
       result[typedKey] = source[typedKey] as T[keyof T];
     }
@@ -581,7 +584,9 @@ export const TypeGuards = {
   emptyArray: (val: unknown): val is unknown[] =>
     Array.isArray(val) && val.length === 0,
   emptyObject: (val: unknown): val is Record<string, unknown> => {
-    return TypeGuards.plainObject(val) && Object.keys(val as object).length === 0;
+    return (
+      TypeGuards.plainObject(val) && Object.keys(val as object).length === 0
+    );
   },
   promise: (val: unknown): val is Promise<unknown> => {
     if (val instanceof Promise) return true;

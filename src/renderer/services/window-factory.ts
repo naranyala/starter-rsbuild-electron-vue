@@ -1,7 +1,7 @@
 import 'winbox';
 import 'winbox/dist/css/winbox.min.css';
-import { generateTheme, generateWindowContent } from './window-generator';
 import { useWindowStore } from '../stores/windowStore';
+import { generateTheme, generateWindowContent } from './window-generator';
 
 declare global {
   interface Window {
@@ -40,9 +40,14 @@ export class WindowFactory {
     const sidebarWidth = 300;
     const edgeGap = 16;
     const headerHeight = 35;
-    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const availableWidth = Math.max(320, screenWidth - sidebarWidth - edgeGap * 2);
+    const screenWidth =
+      typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const screenHeight =
+      typeof window !== 'undefined' ? window.innerHeight : 800;
+    const availableWidth = Math.max(
+      320,
+      screenWidth - sidebarWidth - edgeGap * 2
+    );
     const availableHeight = Math.max(240, screenHeight - edgeGap * 2);
     const defaultWidth = Math.min(500, availableWidth);
     const defaultHeight = Math.min(400, availableHeight);
@@ -64,7 +69,9 @@ export class WindowFactory {
     // Access WinBox from the global window object
     const WinBox = (globalThis as any).WinBox || window.WinBox;
     if (!WinBox) {
-      throw new Error('WinBox is not available. Please ensure it is properly imported.');
+      throw new Error(
+        'WinBox is not available. Please ensure it is properly imported.'
+      );
     }
 
     const winbox = new WinBox(windowOptions);
@@ -87,7 +94,7 @@ export class WindowFactory {
 
     // Disable WinBox docked minimize behavior; use hide/show instead.
     if (typeof winbox.hide === 'function') {
-      winbox.minimize = function(state?: boolean) {
+      winbox.minimize = (state?: boolean) => {
         if (state === false) {
           winbox.min = false;
           if (typeof winbox.show === 'function') {
@@ -111,9 +118,15 @@ export class WindowFactory {
     const handleResize = () => {
       const currentScreenW = window.innerWidth;
       const currentScreenH = window.innerHeight;
-      const currentAvailWidth = Math.max(320, currentScreenW - sidebarWidth - edgeGap * 2);
-      const currentAvailHeight = Math.max(240, currentScreenH - headerHeight - edgeGap * 2);
-      
+      const currentAvailWidth = Math.max(
+        320,
+        currentScreenW - sidebarWidth - edgeGap * 2
+      );
+      const currentAvailHeight = Math.max(
+        240,
+        currentScreenH - headerHeight - edgeGap * 2
+      );
+
       // Only adjust if window is maximized
       if (winbox.max) {
         winbox.setBounds(
@@ -130,15 +143,21 @@ export class WindowFactory {
 
     // Override the maximize function to respect sidebar
     const originalMaximize = winbox.maximize;
-    winbox.maximize = function() {
+    winbox.maximize = function () {
       const result = originalMaximize.call(this);
       // After maximizing, adjust bounds to respect sidebar
       setTimeout(() => {
         const winScreenW = window.innerWidth;
         const winScreenH = window.innerHeight;
-        const availWidth = Math.max(320, winScreenW - sidebarWidth - edgeGap * 2);
-        const availHeight = Math.max(240, winScreenH - headerHeight - edgeGap * 2);
-        
+        const availWidth = Math.max(
+          320,
+          winScreenW - sidebarWidth - edgeGap * 2
+        );
+        const availHeight = Math.max(
+          240,
+          winScreenH - headerHeight - edgeGap * 2
+        );
+
         this.setBounds(
           sidebarWidth + edgeGap,
           headerHeight + edgeGap,

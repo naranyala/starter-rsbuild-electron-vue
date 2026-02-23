@@ -1,16 +1,21 @@
-import { exec, spawn, ChildProcess } from 'child_process';
+import { type ChildProcess, exec, spawn } from 'child_process';
 
 export function executeCommand(
   command: string,
   options: { timeout?: number; maxBuffer?: number; cwd?: string } = {}
-): Promise<{ success: boolean; stdout: string; stderr: string; code?: number }> {
+): Promise<{
+  success: boolean;
+  stdout: string;
+  stderr: string;
+  code?: number;
+}> {
   return new Promise((resolve, reject) => {
     const { timeout = 30000, maxBuffer = 1024 * 1024, cwd } = options;
-    
+
     const execOptions = {
       timeout,
       maxBuffer,
-      ...(cwd && { cwd })
+      ...(cwd && { cwd }),
     };
 
     exec(command, execOptions, (error, stdout, stderr) => {
@@ -19,14 +24,14 @@ export function executeCommand(
           success: false,
           stdout: stdout.toString(),
           stderr: stderr.toString(),
-          code: error.code
+          code: error.code,
         });
       } else {
         resolve({
           success: true,
           stdout: stdout.toString(),
           stderr: stderr.toString(),
-          code: 0
+          code: 0,
         });
       }
     });

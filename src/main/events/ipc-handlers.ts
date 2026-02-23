@@ -19,7 +19,7 @@ export function registerEventBusHandlers(): void {
     `${EVENT_BUS_CHANNEL}:emit`,
     async (event, data: { event: string; payload: unknown }) => {
       const { event: eventName, payload } = data;
-      
+
       console.log('[EventBus IPC] Received from renderer:', eventName);
 
       // Emit in main process

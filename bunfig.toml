@@ -1,0 +1,20 @@
+# Bun Test Configuration
+
+[test]
+# Root directory for tests
+root = "./src"
+
+# Glob pattern for test files
+pattern = "**/*.test.ts"
+
+# Exclude patterns
+exclude = ["**/node_modules/**", "**/dist/**", "**/dist-ts/**", "**/build/**"]
+
+# Timeout for each test in milliseconds
+timeout = 5000
+
+# Stop on first failure
+failFast = false
+
+# Concise test output
+concise = true

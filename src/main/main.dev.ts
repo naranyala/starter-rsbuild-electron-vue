@@ -27,7 +27,7 @@ import {
 import { AppService } from './use-cases/app-service';
 import { FileService } from './use-cases/file-service';
 import { registerAllHandlers } from './use-cases/index';
-import { WindowService } from './use-cases/window-service';
+import { WindowService, WindowServiceStatic } from './use-cases/window.service';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -72,7 +72,7 @@ try {
 } catch (e) {}
 
 const createMainWindow = () => {
-  const mainWindow = WindowService.create({
+  const mainWindow = WindowServiceStatic.create({
     name: 'main',
     webPreferences: {
       nodeIntegration: false,
@@ -88,9 +88,9 @@ const createMainWindow = () => {
   const devServerUrl =
     process.env.ELECTRON_DEV_SERVER || 'http://localhost:3000';
 
-  WindowService.loadUrl(mainWindow, 3000, isDevelopment, devServerUrl);
+  WindowServiceStatic.loadUrl(mainWindow, 3000, isDevelopment, devServerUrl);
 
-  WindowService.setupHandlers(mainWindow, isDevelopment, {
+  WindowServiceStatic.setupHandlers(mainWindow, isDevelopment, {
     onReady: (window: BrowserWindow) => {
       console.log('Main window ready');
       if (
@@ -379,6 +379,39 @@ function registerIpcHandlers() {
 
   ipcMain.handle('shell:showItemInFolder', async (event, fullPath: string) => {
     return shell.showItemInFolder(fullPath);
+  });
+
+  // DevTools IPC handlers
+  ipcMain.handle('devtools:get-process-info', () => {
+    return {
+      pid: process.pid,
+      platform: process.platform,
+      arch: process.arch,
+      nodeVersion: process.version,
+      electronVersion: process.versions.electron,
+      chromeVersion: process.versions.chrome,
+    };
+  });
+
+  ipcMain.handle('devtools:get-memory-info', async () => {
+    const memory = await process.getProcessMemoryInfo?.() || {};
+    return {
+      private: memory.private || 0,
+      shared: memory.shared || 0,
+      residentSetSize: memory.residentSet || 0,
+    };
+  });
+
+  ipcMain.handle('devtools:get-windows', () => {
+    const windows = BrowserWindow.getAllWindows();
+    return windows.map(win => ({
+      id: win.id,
+      title: win.getTitle(),
+      isMinimized: win.isMinimized(),
+      isMaximized: win.isMaximized(),
+      isFocused: win.isFocused(),
+      bounds: win.getBounds(),
+    }));
   });
 
   AppService.registerHandlers();

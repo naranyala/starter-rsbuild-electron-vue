@@ -3,7 +3,11 @@
  * Central container for all main process services
  */
 
-import { DIContainer, getGlobalContainer, setGlobalContainer } from '../../shared/di';
+import {
+  DIContainer,
+  getGlobalContainer,
+  setGlobalContainer,
+} from '../../shared/di';
 import { registerAllMainServices } from './service-providers';
 
 let mainContainer: DIContainer | null = null;
@@ -33,7 +37,9 @@ export function resetMainContainer(): void {
 /**
  * Initialize the main container with Electron dependencies
  */
-export function initializeMainContainer(app?: typeof import('electron').app): DIContainer {
+export function initializeMainContainer(
+  app?: typeof import('electron').app
+): DIContainer {
   const container = getMainContainer();
 
   if (app) {

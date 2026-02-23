@@ -11,10 +11,11 @@ export const IPC_SERVICE_TOKEN = new InjectionToken<IPCService>(
 );
 
 // Window Service token
-export const FRONTEND_WINDOW_SERVICE_TOKEN = new InjectionToken<FrontendWindowService>(
-  'FrontendWindowService',
-  'Service for window-related operations from renderer'
-);
+export const FRONTEND_WINDOW_SERVICE_TOKEN =
+  new InjectionToken<FrontendWindowService>(
+    'FrontendWindowService',
+    'Service for window-related operations from renderer'
+  );
 
 // App Info token
 export const APP_INFO_TOKEN = new InjectionToken<AppInfo>(
