@@ -45,10 +45,11 @@ async function fixImports(dir) {
 
     for (const file of files) {
       const content = readFile(file.path);
+      const fileDir = file.path.replace(/\/[^/]+$/, '');
+      let newContent = content;
 
       // Fix relative imports without extensions
       const importRegex = /from\s+["'](\.[^"']*)["']/g;
-      let newContent = content;
 
       for (const match of content.matchAll(importRegex)) {
         const importPath = match[1];
@@ -56,18 +57,33 @@ async function fixImports(dir) {
         // Skip if already has extension
         if (/\.(js|ts|json|mjs)$/.test(importPath)) continue;
 
-        // Check if it's a directory or file
-        const _fullPath = file.path.replace(/\/[^/]+$/, '') + importPath;
+        // Check if it's a directory import (should resolve to index.js)
+        const fullPath = fileDir + '/' + importPath;
+        
+        // If it's a directory, point to index.js
+        if (exists(fullPath) && exists(fullPath + '/index.js')) {
+          newContent = newContent.replace(
+            new RegExp(
+              `from\\s+["']${importPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
+              'g'
+            ),
+            `from "${importPath}/index.js"`
+          );
+          updated++;
+          continue;
+        }
 
-        // Add .js extension
-        newContent = newContent.replace(
-          new RegExp(
-            `from\\s+["']${importPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
-            'g'
-          ),
-          `from "${importPath}.js"`
-        );
-        updated++;
+        // Check if it's a file that needs .js extension
+        if (exists(fullPath + '.js')) {
+          newContent = newContent.replace(
+            new RegExp(
+              `from\\s+["']${importPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
+              'g'
+            ),
+            `from "${importPath}.js"`
+          );
+          updated++;
+        }
       }
 
       if (newContent !== content) {
@@ -199,8 +215,8 @@ export async function startDevElectron(options = {}) {
     }
 
     // Copy preload script if exists
-    if (exists('./src/preload.js')) {
-      copy('./src/preload.js', './dist-ts/preload.js');
+    if (exists('./src/preload.ts')) {
+      copy('./src/preload.ts', './dist-ts/preload.js');
     }
 
     // Launch Electron

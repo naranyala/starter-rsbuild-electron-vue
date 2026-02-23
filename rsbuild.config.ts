@@ -11,7 +11,7 @@ export default defineConfig({
   ],
   source: {
     entry: {
-      index: './src/frontend/main.ts',
+      index: './src/renderer/main.ts',
     },
     define: {
       'process.env.NODE_ENV': JSON.stringify(
@@ -20,7 +20,7 @@ export default defineConfig({
     },
   },
   html: {
-    template: './src/frontend/index.html',
+    template: './src/renderer/index.html',
     meta: {
       'theme-color': '#000000',
     },
@@ -30,7 +30,7 @@ export default defineConfig({
       root: './build',
     },
     cleanDistPath: true,
-    copy: [{ from: './src/frontend/assets', to: 'assets/' }],
+    copy: [{ from: './src/renderer/assets', to: 'assets/' }],
   },
   server: {
     port: 3000,

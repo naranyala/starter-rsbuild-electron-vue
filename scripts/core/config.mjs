@@ -29,9 +29,9 @@ const DEFAULT_CONFIG = {
 
   // Electron settings
   electron: {
-    entry: 'dist-ts/src/backend/backend.js',
-    devEntry: 'dist-ts/src/backend/backend-dev.js',
-    preload: 'src/preload.js',
+    entry: 'dist-ts/src/main/main.js',
+    devEntry: 'dist-ts/src/main/main.dev.js',
+    preload: 'src/preload.ts',
     distPreload: 'dist-ts/preload.js',
   },
 

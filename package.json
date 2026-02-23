@@ -1,7 +1,7 @@
 {
   "name": "electron-vue-rsbuild-bun",
   "version": "0.1.2",
-  "main": "dist-ts/src/backend/backend.js",
+  "main": "dist-ts/src/main/main.js",
   "type": "module",
   "description": "Modern Electron + Vue boilerplate using Rsbuild and Bun runtime.",
   "scripts": {
